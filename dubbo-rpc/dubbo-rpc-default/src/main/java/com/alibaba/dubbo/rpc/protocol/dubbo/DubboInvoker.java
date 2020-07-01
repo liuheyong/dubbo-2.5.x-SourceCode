@@ -64,6 +64,13 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
         this.invokers = invokers;
     }
 
+    /**
+    * @Author: wenyixicodedog
+    * @Date:  2020-07-01
+    * @Param:  [invocation]
+    * @return:  com.alibaba.dubbo.rpc.Result
+    * @Description:
+    */
     @Override
     protected Result doInvoke(final Invocation invocation) throws Throwable {
         RpcInvocation inv = (RpcInvocation) invocation;

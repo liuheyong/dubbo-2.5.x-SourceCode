@@ -559,6 +559,7 @@ public class Constants {
      */
     public static final String INVOCATION_NEED_MOCK = "invocation.need.mock";
 
+    //标识本地暴露
     public static final String LOCAL_PROTOCOL = "injvm";
 
     public static final String AUTO_ATTACH_INVOCATIONID_KEY = "invocationid.autoattach";

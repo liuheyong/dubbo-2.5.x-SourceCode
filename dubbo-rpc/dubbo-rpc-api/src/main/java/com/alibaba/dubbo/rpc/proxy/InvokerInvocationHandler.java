@@ -33,6 +33,13 @@ public class InvokerInvocationHandler implements InvocationHandler {
         this.invoker = handler;
     }
 
+    /**
+    * @Author: wenyixicodedog
+    * @Date:  2020-07-01
+    * @Param:
+    * @return:
+    * @Description:  实际的调用服务提供者的方法
+    */
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         String methodName = method.getName();
         Class<?>[] parameterTypes = method.getParameterTypes();

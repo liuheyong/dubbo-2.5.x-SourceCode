@@ -31,3 +31,10 @@ public class Provider {
     }
 
 }
+//服务暴露：
+//给一个service标签的serviceBean生成了一个代理好的Invoker，这个invoker放在一个叫exporter的对象下，
+//然后这个exporter放在了serviceBean的一个exporters变量下，准备被调用，然后创建的nettyServer放在了
+//serviceBean的变量protocol下的一个变量serverMap里面，这样一个serverBean的netty服务，方法代理类是
+//不是都生成好了。这里注意protocol是单例生成的，所以如果有bean打开过nettyServer，别的bean就不会再打开。
+//然后回到很前面的ServiceConfig的doExport里面：
+//发现他把生成好了serviceBean放到了一个ApplicationModel里面，后面consumer也会放到这里面

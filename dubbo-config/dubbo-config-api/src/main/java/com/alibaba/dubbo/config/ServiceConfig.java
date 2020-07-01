@@ -70,8 +70,10 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
 
     private static final long serialVersionUID = 3033787999037024738L;
 
+    // TODO SPI生成协议
     private static final Protocol protocol = ExtensionLoader.getExtensionLoader(Protocol.class).getAdaptiveExtension();
 
+    // TODO SPI生成动态代理
     private static final ProxyFactory proxyFactory = ExtensionLoader.getExtensionLoader(ProxyFactory.class).getAdaptiveExtension();
 
     private static final Map<String, Integer> RANDOM_PORT_MAP = new HashMap<String, Integer>();
@@ -191,6 +193,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         return unexported;
     }
 
+    // TODO 将服务暴露
     public synchronized void export() {
         if (provider != null) {
             if (export == null) {
@@ -207,14 +210,17 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         if (delay != null && delay > 0) {
             delayExportExecutor.schedule(new Runnable() {
                 public void run() {
+                    // TODO 将服务暴露
                     doExport();
                 }
             }, delay, TimeUnit.MILLISECONDS);
         } else {
+            // TODO 将服务暴露
             doExport();
         }
     }
 
+    // TODO 将服务暴露
     protected synchronized void doExport() {
         if (unexported) {
             throw new IllegalStateException("Already unexported!");
@@ -304,14 +310,19 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 throw new IllegalStateException("The stub implementation class " + stubClass.getName() + " not implement interface " + interfaceName);
             }
         }
+        //初始化application变量
         checkApplication();
+        //初始化registries变量
         checkRegistry();
+        //初始化protocols变量
         checkProtocol();
+        //添加一些系统变量
         appendProperties(this);
         checkStubAndMock(interfaceClass);
         if (path == null || path.length() == 0) {
             path = interfaceName;
         }
+        //生成URL链接
         doExportUrls();
         ProviderModel providerModel = new ProviderModel(getUniqueServiceName(), this, ref);
         ApplicationModel.initProviderModel(getUniqueServiceName(), providerModel);
@@ -351,8 +362,21 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void doExportUrls() {
+        //这个方法是将registries变量里面的每个地址，拼上application和registryconfig里面的参数，
+        //拼成一个registryUrl(不是最后生成的url)带参数的标准格式，如:www.xxx.com?key1=value1&key2=value2。
+        //然后返回这些url的列表,下面是自己一个服务生成的url例子:
+        //registry:172.23.2.101:2181/com.alibaba.dubbo.registry.RegistryService?application=oic-dubbo-provider&dubbo=2.6.1&logger=slf4j&pid=15258&register=true&registry=zookeeper&timestamp=1528958780785
         List<URL> registryURLs = loadRegistries(true);
+        //dubbo支持多种协议,默认使用的是dubbo协议,在不同服务上支持不同协议或者在同一个服务上使用多个协议
         for (ProtocolConfig protocolConfig : protocols) {
+            // TODO 生成的完整url，遍历protocols变量，将protocols列表中的每个protocol根据url暴露出去
+            //例如：dubbo://10.8.0.28:12000/com.tyyd.oic.service.PushMessageService?accepts=1000
+            // &anyhost=true&application=oic-dubbo-provider&bind.ip=10.8.0.28&bind.port=12000
+            // &buffer=8192&charset=UTF-8&default.service.filter=dubboCallDetailFilter&dubbo=2.6.1
+            // &generic=false&interface=com.tyyd.oic.service.PushMessageService&iothreads=9&logger=slf4j
+            // &methods=deletePushMessage,getPushMessage,batchPushMessage,addPushMessage,updatePushMessage,
+            // qryPushMessage&payload=8388608&pid=15374&queues=0&retries=0&revision=1.0.0&serialization=hessian2&
+            // side=provider&threadpool=fixed&threads=100&timeout=6000&timestamp=1528959454516&version=1.0.0
             doExportUrlsFor1Protocol(protocolConfig, registryURLs);
         }
     }
@@ -477,13 +501,18 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
 
         String scope = url.getParameter(Constants.SCOPE_KEY);
         // don't export when none is configured
+        // 配置为none标识不暴露
         if (!Constants.SCOPE_NONE.toString().equalsIgnoreCase(scope)) {
 
             // export to local if the config is not remote (export to remote only when config is remote)
+            // 如果暴露不是远程的，则暴露到本地（仅当暴露是远程的时，暴露到远程）
             if (!Constants.SCOPE_REMOTE.toString().equalsIgnoreCase(scope)) {
+                // TODO 本地暴露 —— 有可能系统自己调用自己服务的情况 本地暴露是暴露在JVM中,不需要网络通信.
                 exportLocal(url);
             }
             // export to remote if the config is not local (export to local only when config is local)
+            // 如果暴露不是本地，则暴露到远程（仅当暴露为本地时，暴露到本地）
+            // TODO 远程暴露 远程暴露是将ip,端口等信息暴露给远程客户端,调用时需要网络通信.
             if (!Constants.SCOPE_LOCAL.toString().equalsIgnoreCase(scope)) {
                 if (logger.isInfoEnabled()) {
                     logger.info("Export dubbo service " + interfaceClass.getName() + " to url " + url);

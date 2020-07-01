@@ -65,6 +65,13 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
         this.required = required;
     }
 
+    /**
+    * @Author: wenyixicodedog
+    * @Date:  2020-07-01
+    * @Param:  [element, parserContext, beanClass, required]
+    * @return:  org.springframework.beans.factory.config.BeanDefinition
+    * @Description:  拿到xml中所有配置的基本信息，然后定义成spring中的BeanDefinition
+    */
     @SuppressWarnings("unchecked")
     private static BeanDefinition parse(Element element, ParserContext parserContext, Class<?> beanClass, boolean required) {
         RootBeanDefinition beanDefinition = new RootBeanDefinition();
@@ -108,6 +115,8 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
                 }
             }
         } else if (ServiceBean.class.equals(beanClass)) {
+            //如果用了class标签，spring会生成相应的class的BeanDefinition,
+            //并创建了一个BeanDefinitionHolder来代表运行时的bean,并且这个bean的名字是id+Impl
             String className = element.getAttribute("class");
             if (className != null && className.length() > 0) {
                 RootBeanDefinition classDefinition = new RootBeanDefinition();
@@ -203,6 +212,8 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
                                     reference = new RuntimeBeanReference(throwRef);
                                     beanDefinition.getPropertyValues().addPropertyValue("onthrowMethod", throwMethod);
                                 } else {
+                                    //如果有ref,就用RuntimeBeanReference作为创建时的bean
+                                    //如果ref和class都写了，则以ref为准，因为ref的代码在后面
                                     if ("ref".equals(property) && parserContext.getRegistry().containsBeanDefinition(value)) {
                                         BeanDefinition refBean = parserContext.getRegistry().getBeanDefinition(value);
                                         if (!refBean.isSingleton()) {

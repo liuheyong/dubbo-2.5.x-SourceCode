@@ -112,6 +112,7 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
         return service;
     }
 
+    //监听spring容器初始化完成
     public void onApplicationEvent(ContextRefreshedEvent event) {
         if (isDelay() && !isExported() && !isUnexported()) {
             if (logger.isInfoEnabled()) {
@@ -257,6 +258,8 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
             }
         }
         if (!isDelay()) {
+            // TODO 这个export方法就是将本地服务暴露给外面调用的过程，
+            // 这样就保证了spring容器在初始化完成的时候，所有的serivceBean都暴露服务了
             export();
         }
     }
