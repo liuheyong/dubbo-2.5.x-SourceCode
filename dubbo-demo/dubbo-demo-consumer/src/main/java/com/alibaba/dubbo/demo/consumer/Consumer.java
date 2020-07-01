@@ -30,9 +30,9 @@ public class Consumer {
         DemoService demoService = (DemoService) context.getBean("demoService"); // get remote service proxy
         while (true) {
             try {
-                Thread.sleep(1000);
                 String hello = demoService.sayHello("wenyixicodedog"); // call remote method
                 System.out.println(hello); // get result
+                Thread.sleep(1000 * 60 * 60 * 24);
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
             }
