@@ -61,6 +61,13 @@ public class NettyServer extends AbstractServer implements Server {
         super(url, ChannelHandlers.wrap(handler, ExecutorUtil.setThreadName(url, SERVER_THREAD_POOL_NAME)));
     }
 
+    /**
+    * @Author: wenyixicodedog
+    * @Date:  2020-07-02
+    * @Param:  []
+    * @return:  void
+    * @Description:  NettyServer相关设置
+    */
     @Override
     protected void doOpen() throws Throwable {
         NettyHelper.setNettyLoggerFactory();

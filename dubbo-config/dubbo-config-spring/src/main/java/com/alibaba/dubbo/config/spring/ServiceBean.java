@@ -112,12 +112,21 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
         return service;
     }
 
-    //监听spring容器初始化完成
+    /**
+    * @Author: wenyixicodedog
+    * @Date:  2020-07-03
+    * @Param:
+    * @return:
+    * @Description:  ServiceBean实现了spring的ApplicationListener接口，所以也是一个监听器。
+     *               在spring容器加载完成后触发contextrefreshedevent事件，这个事件会被实现了ApplicationListener
+     *               接口的类监听到，执行对应的onApplicationEvent函数。
+    */
     public void onApplicationEvent(ContextRefreshedEvent event) {
         if (isDelay() && !isExported() && !isUnexported()) {
             if (logger.isInfoEnabled()) {
                 logger.info("The service ready on spring started. service: " + getInterface());
             }
+            // TODO 调用父类的export方法来实现服务的发布处理。
             export();
         }
     }

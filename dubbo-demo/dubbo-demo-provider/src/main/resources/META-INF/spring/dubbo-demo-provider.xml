@@ -24,12 +24,19 @@
     <!-- provider's application name, used for tracing dependency relationship -->
     <dubbo:application name="demo-provider"/>
 
+    <!-- 引用协议缺省值，当<dubbo:service>没有配置prototol属性时，使用此配置 -->
+    <!--<dubbo:provider protocol="xxx1" />-->
+
     <!-- use multicast registry center to export service -->
     <dubbo:registry address="zookeeper://127.0.0.1:2181" />
 
     <!-- use dubbo protocol to export service on port 20880 -->
+    <!-- 声明协议，如果没有配置id，将以name为id -->
+    <!--<dubbo:protocol id="xxx1" name="xxx" />-->
     <dubbo:protocol name="dubbo" port="20880"/>
 
+    <!-- 引用协议，如果没有配置protocol属性，将在ApplicationContext中自动扫描protocol配置 -->
+    <!--<dubbo:service protocol="xxx1" />-->
     <!-- service implementation, as same as regular local bean -->
     <bean id="demoService" class="com.alibaba.dubbo.demo.provider.DemoServiceImpl"/>
 

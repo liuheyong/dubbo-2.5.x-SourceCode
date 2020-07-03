@@ -51,6 +51,8 @@ public @interface Adaptive {
      *
      * @return parameter key names in URL
      */
+    // TODO @Adaptive注解中的值这里我叫它value，value可以是一个数组，如果为空的话，
+    // TODO value等于接口名小写(例如接口名:per.qiao.A, 那么value=a)
     String[] value() default {};
 
 }

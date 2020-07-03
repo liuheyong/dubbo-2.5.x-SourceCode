@@ -79,18 +79,25 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
     private static final Map<String, Integer> RANDOM_PORT_MAP = new HashMap<String, Integer>();
 
     private static final ScheduledExecutorService delayExportExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("DubboServiceDelayExporter", true));
+
     private final List<URL> urls = new ArrayList<URL>();
+
     private final List<Exporter<?>> exporters = new ArrayList<Exporter<?>>();
+
     // interface type
     private String interfaceName;
     private Class<?> interfaceClass;
+
     // reference to interface impl
     private T ref;
     // service name
     private String path;
+
     // method configuration
     private List<MethodConfig> methods;
+
     private ProviderConfig provider;
+
     private transient volatile boolean exported;
 
     private transient volatile boolean unexported;
@@ -197,25 +204,24 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
     public synchronized void export() {
         if (provider != null) {
             if (export == null) {
+                //是否暴露
                 export = provider.getExport();
             }
             if (delay == null) {
+                //是否延迟暴露
                 delay = provider.getDelay();
             }
         }
+        //不暴露直接返回
         if (export != null && !export) {
             return;
         }
-
+        //是否延迟发布服务接口
         if (delay != null && delay > 0) {
-            delayExportExecutor.schedule(new Runnable() {
-                public void run() {
-                    // TODO 将服务暴露
-                    doExport();
-                }
-            }, delay, TimeUnit.MILLISECONDS);
+            // TODO 延迟暴露
+            delayExportExecutor.schedule(() -> doExport(), delay, TimeUnit.MILLISECONDS);
         } else {
-            // TODO 将服务暴露
+            // TODO 将服务立即暴露出去
             doExport();
         }
     }
@@ -387,7 +393,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             name = "dubbo";
         }
 
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<String, String>(16);
         map.put(Constants.SIDE_KEY, Constants.PROVIDER_SIDE);
         map.put(Constants.DUBBO_VERSION_KEY, Version.getVersion());
         map.put(Constants.TIMESTAMP_KEY, String.valueOf(System.currentTimeMillis()));
@@ -502,7 +508,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         String scope = url.getParameter(Constants.SCOPE_KEY);
         // don't export when none is configured
         // 配置为none标识不暴露
-        if (!Constants.SCOPE_NONE.toString().equalsIgnoreCase(scope)) {
+        if (!Constants.SCOPE_NONE.equalsIgnoreCase(scope)) {
 
             // export to local if the config is not remote (export to remote only when config is remote)
             // 如果暴露不是远程的，则暴露到本地（仅当暴露是远程的时，暴露到远程）
@@ -513,7 +519,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             // export to remote if the config is not local (export to local only when config is local)
             // 如果暴露不是本地，则暴露到远程（仅当暴露为本地时，暴露到本地）
             // TODO 远程暴露 远程暴露是将ip,端口等信息暴露给远程客户端,调用时需要网络通信.
-            if (!Constants.SCOPE_LOCAL.toString().equalsIgnoreCase(scope)) {
+            if (!Constants.SCOPE_LOCAL.equalsIgnoreCase(scope)) {
                 if (logger.isInfoEnabled()) {
                     logger.info("Export dubbo service " + interfaceClass.getName() + " to url " + url);
                 }
@@ -530,6 +536,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                         Invoker<?> invoker = proxyFactory.getInvoker(ref, (Class) interfaceClass, registryURL.addParameterAndEncoded(Constants.EXPORT_KEY, url.toFullString()));
                         DelegateProviderMetaDataInvoker wrapperInvoker = new DelegateProviderMetaDataInvoker(invoker, this);
 
+                        // TODO 远程暴露
                         Exporter<?> exporter = protocol.export(wrapperInvoker);
                         exporters.add(exporter);
                     }
