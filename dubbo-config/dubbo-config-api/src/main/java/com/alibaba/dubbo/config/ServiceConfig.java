@@ -88,7 +88,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
     private String interfaceName;
     private Class<?> interfaceClass;
 
-    // reference to interface impl
+    // 接口的实现类
     private T ref;
     // service name
     private String path;
@@ -98,8 +98,9 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
 
     private ProviderConfig provider;
 
+    //允许将服务暴露
     private transient volatile boolean exported;
-
+    //不允许将服务暴露
     private transient volatile boolean unexported;
 
     private volatile String generic;
@@ -221,7 +222,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             // TODO 延迟暴露
             delayExportExecutor.schedule(() -> doExport(), delay, TimeUnit.MILLISECONDS);
         } else {
-            // TODO 将服务立即暴露出去
+            // TODO 直接发布接口
             doExport();
         }
     }
@@ -238,6 +239,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         if (interfaceName == null || interfaceName.length() == 0) {
             throw new IllegalStateException("<dubbo:service interface=\"\" /> interface not allow null!");
         }
+        //检查配置，配置填充属性，setter注入
         checkDefault();
         if (provider != null) {
             if (application == null) {
@@ -279,11 +281,12 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             }
         } else {
             try {
-                interfaceClass = Class.forName(interfaceName, true, Thread.currentThread()
-                        .getContextClassLoader());
+                //将类加载进jvm当中
+                interfaceClass = Class.forName(interfaceName, true, Thread.currentThread().getContextClassLoader());
             } catch (ClassNotFoundException e) {
                 throw new IllegalStateException(e.getMessage(), e);
             }
+            //检查校验
             checkInterfaceAndMethods(interfaceClass, methods);
             checkRef();
             generic = Boolean.FALSE.toString();
@@ -322,7 +325,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         checkRegistry();
         //初始化protocols变量
         checkProtocol();
-        //添加一些系统变量
+        //注入变量
         appendProperties(this);
         checkStubAndMock(interfaceClass);
         if (path == null || path.length() == 0) {
@@ -331,6 +334,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         //生成URL链接
         doExportUrls();
         ProviderModel providerModel = new ProviderModel(getUniqueServiceName(), this, ref);
+        //最终放进ApplicationModel里面
         ApplicationModel.initProviderModel(getUniqueServiceName(), providerModel);
     }
 
@@ -369,20 +373,13 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void doExportUrls() {
         //这个方法是将registries变量里面的每个地址，拼上application和registryconfig里面的参数，
-        //拼成一个registryUrl(不是最后生成的url)带参数的标准格式，如:www.xxx.com?key1=value1&key2=value2。
+        //拼成一个registryUrl(不过并不是最终生成的url)带参数的标准格式，如:www.xxx.com?key1=value1&key2=value2。
         //然后返回这些url的列表,下面是自己一个服务生成的url例子:
-        //registry:172.23.2.101:2181/com.alibaba.dubbo.registry.RegistryService?application=oic-dubbo-provider&dubbo=2.6.1&logger=slf4j&pid=15258&register=true&registry=zookeeper&timestamp=1528958780785
+        //registry://127.0.0.1:2181/com.alibaba.dubbo.registry.RegistryService?application=demo-provider&dubbo=2.0.0&pid=1469&qos.port=22222&registry=zookeeper&timestamp=1593751556852
         List<URL> registryURLs = loadRegistries(true);
         //dubbo支持多种协议,默认使用的是dubbo协议,在不同服务上支持不同协议或者在同一个服务上使用多个协议
         for (ProtocolConfig protocolConfig : protocols) {
-            // TODO 生成的完整url，遍历protocols变量，将protocols列表中的每个protocol根据url暴露出去
-            //例如：dubbo://10.8.0.28:12000/com.tyyd.oic.service.PushMessageService?accepts=1000
-            // &anyhost=true&application=oic-dubbo-provider&bind.ip=10.8.0.28&bind.port=12000
-            // &buffer=8192&charset=UTF-8&default.service.filter=dubboCallDetailFilter&dubbo=2.6.1
-            // &generic=false&interface=com.tyyd.oic.service.PushMessageService&iothreads=9&logger=slf4j
-            // &methods=deletePushMessage,getPushMessage,batchPushMessage,addPushMessage,updatePushMessage,
-            // qryPushMessage&payload=8388608&pid=15374&queues=0&retries=0&revision=1.0.0&serialization=hessian2&
-            // side=provider&threadpool=fixed&threads=100&timeout=6000&timestamp=1528959454516&version=1.0.0
+            // TODO 遍历protocols变量，注册到每个注册中心上去，也就是将当前这个服务以某种协议在多个注册机上进行发布
             doExportUrlsFor1Protocol(protocolConfig, registryURLs);
         }
     }
@@ -506,17 +503,14 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         }
 
         String scope = url.getParameter(Constants.SCOPE_KEY);
-        // don't export when none is configured
         // 配置为none标识不暴露
         if (!Constants.SCOPE_NONE.equalsIgnoreCase(scope)) {
 
-            // export to local if the config is not remote (export to remote only when config is remote)
             // 如果暴露不是远程的，则暴露到本地（仅当暴露是远程的时，暴露到远程）
-            if (!Constants.SCOPE_REMOTE.toString().equalsIgnoreCase(scope)) {
+            if (!Constants.SCOPE_REMOTE.equalsIgnoreCase(scope)) {
                 // TODO 本地暴露 —— 有可能系统自己调用自己服务的情况 本地暴露是暴露在JVM中,不需要网络通信.
                 exportLocal(url);
             }
-            // export to remote if the config is not local (export to local only when config is local)
             // 如果暴露不是本地，则暴露到远程（仅当暴露为本地时，暴露到本地）
             // TODO 远程暴露 远程暴露是将ip,端口等信息暴露给远程客户端,调用时需要网络通信.
             if (!Constants.SCOPE_LOCAL.equalsIgnoreCase(scope)) {
@@ -533,6 +527,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                         if (logger.isInfoEnabled()) {
                             logger.info("Register dubbo service " + interfaceClass.getName() + " url " + url + " to registry " + registryURL);
                         }
+
                         Invoker<?> invoker = proxyFactory.getInvoker(ref, (Class) interfaceClass, registryURL.addParameterAndEncoded(Constants.EXPORT_KEY, url.toFullString()));
                         DelegateProviderMetaDataInvoker wrapperInvoker = new DelegateProviderMetaDataInvoker(invoker, this);
 
@@ -552,6 +547,13 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         this.urls.add(url);
     }
 
+    /**
+    * @Author: wenyixicodedog
+    * @Date:  2020-07-03
+    * @Param:  [url]
+    * @return:  void
+    * @Description:  缓存服务到本地列表
+    */
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void exportLocal(URL url) {
         if (!Constants.LOCAL_PROTOCOL.equalsIgnoreCase(url.getProtocol())) {
@@ -559,13 +561,11 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                     .setProtocol(Constants.LOCAL_PROTOCOL)
                     .setHost(LOCALHOST)
                     .setPort(0);
-            Exporter<?> exporter = protocol.export(
-                    proxyFactory.getInvoker(ref, (Class) interfaceClass, local));
+            Exporter<?> exporter = protocol.export(proxyFactory.getInvoker(ref, (Class) interfaceClass, local));
             exporters.add(exporter);
             logger.info("Export dubbo service " + interfaceClass.getName() + " to local registry");
         }
     }
-
 
     /**
      * Register & bind IP address for service provider, can be configured separately.
@@ -720,6 +720,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         if (provider == null) {
             provider = new ProviderConfig();
         }
+        //appendProperties方法用于追加属性，setter注入
         appendProperties(provider);
     }
 

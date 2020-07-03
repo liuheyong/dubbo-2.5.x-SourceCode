@@ -97,6 +97,13 @@ public abstract class AbstractConfig implements Serializable {
         return value;
     }
 
+    /**
+    * @Author: wenyixicodedog
+    * @Date:  2020-07-03
+    * @Param:
+    * @return:
+    * @Description:  给config进行属性赋值(setter注入)
+    */
     protected static void appendProperties(AbstractConfig config) {
         if (config == null) {
             return;
@@ -155,6 +162,7 @@ public abstract class AbstractConfig implements Serializable {
                         }
                     }
                     if (value != null && value.length() > 0) {
+                        //进行成员变量赋值
                         method.invoke(config, new Object[]{convertPrimitive(method.getParameterTypes()[0], value)});
                     }
                 }

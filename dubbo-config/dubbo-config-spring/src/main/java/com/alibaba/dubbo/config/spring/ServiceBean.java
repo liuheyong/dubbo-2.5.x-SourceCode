@@ -121,7 +121,7 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
      *               在spring容器加载完成后触发contextrefreshedevent事件，这个事件会被实现了ApplicationListener
      *               接口的类监听到，执行对应的onApplicationEvent函数。
     */
-    public void onApplicationEvent(ContextRefreshedEvent event) {
+        public void onApplicationEvent(ContextRefreshedEvent event) {
         if (isDelay() && !isExported() && !isUnexported()) {
             if (logger.isInfoEnabled()) {
                 logger.info("The service ready on spring started. service: " + getInterface());
@@ -140,6 +140,13 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
         return supportedApplicationListener && (delay == null || delay == -1);
     }
 
+    /**
+    * @Author: wenyixicodedog
+    * @Date:  2020-07-03
+    * @Param:  []
+    * @return:  void
+    * @Description:  主要进行一些初始化完成之后一些属性赋值操作
+    */
     @SuppressWarnings({"unchecked", "deprecation"})
     public void afterPropertiesSet() throws Exception {
         if (getProvider() == null) {
@@ -221,6 +228,7 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
                     }
                 }
                 if (registryConfigs != null && registryConfigs.size() > 0) {
+                    // TODO 初始化注册中心list
                     super.setRegistries(registryConfigs);
                 }
             }
@@ -246,6 +254,7 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
         }
         if ((getProtocols() == null || getProtocols().size() == 0)
                 && (getProvider() == null || getProvider().getProtocols() == null || getProvider().getProtocols().size() == 0)) {
+            // TODO 返回给定类型或子类的所有bean
             Map<String, ProtocolConfig> protocolConfigMap = applicationContext == null ? null : BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, ProtocolConfig.class, false, false);
             if (protocolConfigMap != null && protocolConfigMap.size() > 0) {
                 List<ProtocolConfig> protocolConfigs = new ArrayList<ProtocolConfig>();
@@ -255,6 +264,7 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
                     }
                 }
                 if (protocolConfigs != null && protocolConfigs.size() > 0) {
+                    // TODO 初始化协议列表list
                     super.setProtocols(protocolConfigs);
                 }
             }

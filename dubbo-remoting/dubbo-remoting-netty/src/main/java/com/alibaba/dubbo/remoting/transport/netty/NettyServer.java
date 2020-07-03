@@ -74,6 +74,7 @@ public class NettyServer extends AbstractServer implements Server {
         ExecutorService boss = Executors.newCachedThreadPool(new NamedThreadFactory("NettyServerBoss", true));
         ExecutorService worker = Executors.newCachedThreadPool(new NamedThreadFactory("NettyServerWorker", true));
         ChannelFactory channelFactory = new NioServerSocketChannelFactory(boss, worker, getUrl().getPositiveParameter(Constants.IO_THREADS_KEY, Constants.DEFAULT_IO_THREADS));
+        //启动一个netty服务
         bootstrap = new ServerBootstrap(channelFactory);
 
         final NettyHandler nettyHandler = new NettyHandler(getUrl(), this);
@@ -92,6 +93,7 @@ public class NettyServer extends AbstractServer implements Server {
                 }*/
                 pipeline.addLast("decoder", adapter.getDecoder());
                 pipeline.addLast("encoder", adapter.getEncoder());
+                //设置netty接受客户端请求后的处理器
                 pipeline.addLast("handler", nettyHandler);
                 return pipeline;
             }

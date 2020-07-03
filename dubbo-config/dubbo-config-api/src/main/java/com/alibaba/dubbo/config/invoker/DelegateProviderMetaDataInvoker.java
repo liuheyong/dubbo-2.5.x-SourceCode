@@ -24,6 +24,7 @@ import com.alibaba.dubbo.rpc.Result;
 import com.alibaba.dubbo.rpc.RpcException;
 
 public class DelegateProviderMetaDataInvoker<T> implements Invoker {
+
     protected final Invoker<T> invoker;
     private ServiceConfig metadata;
 

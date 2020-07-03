@@ -126,7 +126,7 @@ public abstract class FailbackRegistry extends AbstractRegistry {
         failedRegistered.remove(url);
         failedUnregistered.remove(url);
         try {
-            // Sending a registration request to the server side
+            // TODO  发送注册请求到zk服务器端
             doRegister(url);
         } catch (Exception e) {
             Throwable t = e;
@@ -145,7 +145,7 @@ public abstract class FailbackRegistry extends AbstractRegistry {
                 logger.error("Failed to register " + url + ", waiting for retry, cause: " + t.getMessage(), t);
             }
 
-            // Record a failed registration request to a failed list, retry regularly
+            // TODO  将失败的注册请求记录到失败列表中，并定期重试
             failedRegistered.add(url);
         }
     }
@@ -185,7 +185,7 @@ public abstract class FailbackRegistry extends AbstractRegistry {
         super.subscribe(url, listener);
         removeFailedSubscribed(url, listener);
         try {
-            // Sending a subscription request to the server side
+            // TODO  发送订阅请求到zk服务器端
             doSubscribe(url, listener);
         } catch (Exception e) {
             Throwable t = e;
@@ -209,7 +209,7 @@ public abstract class FailbackRegistry extends AbstractRegistry {
                 }
             }
 
-            // Record a failed registration request to a failed list, retry regularly
+            // TODO  将失败的注册请求记录到失败列表中，并定期重试
             addFailedSubscribed(url, listener);
         }
     }

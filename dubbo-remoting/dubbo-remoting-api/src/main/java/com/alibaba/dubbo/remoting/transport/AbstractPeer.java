@@ -129,6 +129,18 @@ public abstract class AbstractPeer implements Endpoint, ChannelHandler {
         handler.sent(ch, msg);
     }
 
+    /**
+    * @Author: wenyixicodedog
+    * @Date:  2020-07-03
+    * @Param:
+    * @return:
+    * @Description: 在启动netty服务的时候，就将requestHandler对象经过层层包装传递给了NettyServer，
+     * 再通过NettyServer类的构造函数将它保存到了NettyServer类的终极父类AbstractPeer的handler属性上，
+     * AbstractPeer类又实现了ChannelHandler接口，重写了received方法。所以当netty框架接收到请求时执行
+     * messageReceived方法里面的handler.received(channel, e.getMessage()); ，其实执行的是AbstractPeer
+     * 类的received方法，received然后里面又执行了handler.received(ch, msg); 这里的handler就是DubboProtocol
+     * 类中创建的requestHandler对象。
+    */
     public void received(Channel ch, Object msg) throws RemotingException {
         if (closed) {
             return;

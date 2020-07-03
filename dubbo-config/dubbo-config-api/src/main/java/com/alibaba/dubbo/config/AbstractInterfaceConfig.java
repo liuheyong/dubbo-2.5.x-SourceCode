@@ -89,7 +89,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
     // module info
     protected ModuleConfig module;
 
-    // registry centers
+    // 注册中心
     protected List<RegistryConfig> registries;
 
     // connection events
@@ -101,16 +101,24 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
     // callback limits
     private Integer callbacks;
 
-    // the scope for referring/exporting a service, if it's local, it means searching in current JVM only.
+    // 引用/导出服务的作用域，如果它是本地的，则意味着仅在当前JVM中进行搜索
     private String scope;
 
+    /**
+    * @Author: wenyixicodedog
+    * @Date:  2020-07-03
+    * @Param:
+    * @return:
+    * @Description:  注册中心检查
+    */
     protected void checkRegistry() {
-        // for backward compatibility
+        // 缓存注册中心
         if (registries == null || registries.size() == 0) {
             String address = ConfigUtils.getProperty("dubbo.registry.address");
             if (address != null && address.length() > 0) {
                 registries = new ArrayList<RegistryConfig>();
                 String[] as = address.split("\\s*[|]+\\s*");
+                //如果是多注册中心，全部缓存到registries中去
                 for (String a : as) {
                     RegistryConfig registryConfig = new RegistryConfig();
                     registryConfig.setAddress(a);
@@ -118,6 +126,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                 }
             }
         }
+        //如果注册中心这个时候仍然为空，则直接抛出异常
         if ((registries == null || registries.size() == 0)) {
             throw new IllegalStateException((getClass().getSimpleName().startsWith("Reference")
                     ? "No such any registry to refer service in consumer "
@@ -127,6 +136,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                     + Version.getVersion()
                     + ", Please add <dubbo:registry address=\"...\" /> to your spring config. If you want unregister, please set <dubbo:service registry=\"N/A\" />");
         }
+        //注册中心填充属性
         for (RegistryConfig registryConfig : registries) {
             appendProperties(registryConfig);
         }
@@ -145,6 +155,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
             throw new IllegalStateException(
                     "No such application config! Please add <dubbo:application name=\"...\" /> to your spring config.");
         }
+
         appendProperties(application);
 
         String wait = ConfigUtils.getProperty(Constants.SHUTDOWN_WAIT_KEY);

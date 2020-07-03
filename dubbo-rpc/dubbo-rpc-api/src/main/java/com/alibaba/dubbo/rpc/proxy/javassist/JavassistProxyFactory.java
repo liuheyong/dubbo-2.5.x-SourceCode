@@ -35,14 +35,14 @@ public class JavassistProxyFactory extends AbstractProxyFactory {
     }
 
     public <T> Invoker<T> getInvoker(T proxy, Class<T> type, URL url) {
-        // TODO Wrapper cannot handle this scenario correctly: the classname contains '$'
-        // TODO Wrapper 无法正确处理此情况：类名包含“ $”
+        // TODO Wrapper 无法正确处理此情况：类名包含“$”
         final Wrapper wrapper = Wrapper.getWrapper(proxy.getClass().getName().indexOf('$') < 0 ? proxy.getClass() : type);
+        // TODO 创建匿名invoker对象，并且重写doInvoke抽象方法,invoker其实就是对proxy, type, url三者信息的封装
         return new AbstractProxyInvoker<T>(proxy, type, url) {
+            //重写抽象方法 返回RpcResult
             @Override
-            protected Object doInvoke(T proxy, String methodName,
-                                      Class<?>[] parameterTypes,
-                                      Object[] arguments) throws Throwable {
+            protected Object doInvoke(T proxy, String methodName, Class<?>[] parameterTypes, Object[] arguments) throws Throwable {
+                // TODO 调用客户端请求方法，响应客户端请求
                 return wrapper.invokeMethod(proxy, methodName, parameterTypes, arguments);
             }
         };
