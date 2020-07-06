@@ -34,10 +34,24 @@ public class HeaderExchanger implements Exchanger {
 
     public static final String NAME = "header";
 
+    /**
+    * @Author: wenyixicodedog
+    * @Date:  2020-07-06
+    * @Param:
+    * @return:
+    * @Description:  客户端创建连接对象client
+    */
     public ExchangeClient connect(URL url, ExchangeHandler handler) throws RemotingException {
         return new HeaderExchangeClient(Transporters.connect(url, new DecodeHandler(new HeaderExchangeHandler(handler))), true);
     }
 
+    /**
+     * @Author: wenyixicodedog
+     * @Date:  2020-07-06
+     * @Param:
+     * @return:
+     * @Description:  服务端绑定server
+     */
     public ExchangeServer bind(URL url, ExchangeHandler handler) throws RemotingException {
         return new HeaderExchangeServer(Transporters.bind(url, new DecodeHandler(new HeaderExchangeHandler(handler))));
     }

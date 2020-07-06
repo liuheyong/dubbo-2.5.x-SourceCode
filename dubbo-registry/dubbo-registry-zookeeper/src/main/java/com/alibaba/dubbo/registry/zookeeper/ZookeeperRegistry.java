@@ -130,6 +130,10 @@ public class ZookeeperRegistry extends FailbackRegistry {
                     zkListeners.putIfAbsent(url, new ConcurrentHashMap<NotifyListener, ChildListener>());
                     listeners = zkListeners.get(url);
                 }
+                //ChildListener是对关注的路径的下一级的节点的增减，就会触发的监听器。
+                //所以我们看到listeners.putIfAbsent里放置的是一个匿名类，他里面的实现
+                //就是notify。也就是说当关注的路径下的增减节点，就会触发回调，然后通过notify方法，
+                //进行业务数据的变更逻辑。当我们都注册好了之后，自己触发了notify，他的具体的逻辑在doNotify里面。
                 ChildListener zkListener = listeners.get(listener);
                 if (zkListener == null) {
                     listeners.putIfAbsent(listener, new ChildListener() {
@@ -179,6 +183,7 @@ public class ZookeeperRegistry extends FailbackRegistry {
                         urls.addAll(toUrlsWithEmpty(url, path, children));
                     }
                 }
+                // TODO 订阅变更提醒
                 notify(url, listener, urls);
             }
         } catch (Throwable e) {

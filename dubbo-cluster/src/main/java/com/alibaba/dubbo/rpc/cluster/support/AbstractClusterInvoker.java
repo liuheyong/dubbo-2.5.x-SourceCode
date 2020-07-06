@@ -96,7 +96,7 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
      * @param invokers invoker candidates
      * @param selected  exclude selected invokers or not
      * @return
-     * @throws RpcExceptione
+     * @throws
      */
     protected Invoker<T> select(LoadBalance loadbalance, Invocation invocation, List<Invoker<T>> invokers, List<Invoker<T>> selected) throws RpcException {
         if (invokers == null || invokers.size() == 0)
@@ -129,13 +129,13 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
             return null;
         if (invokers.size() == 1)
             return invokers.get(0);
-        // If we only have two invokers, use round-robin instead.
+        // 如果只有两个invoker，退化成轮循
         if (invokers.size() == 2 && selected != null && selected.size() > 0) {
             return selected.get(0) == invokers.get(0) ? invokers.get(1) : invokers.get(0);
         }
         Invoker<T> invoker = loadbalance.select(invokers, getUrl(), invocation);
 
-        //If the `invoker` is in the  `selected` or invoker is unavailable && availablecheck is true, reselect.
+        //如果selected中包含（优先判断）或者不可用 && available check=true 则重试
         if ((selected != null && selected.contains(invoker))
                 || (!invoker.isAvailable() && getUrl() != null && availablecheck)) {
             try {

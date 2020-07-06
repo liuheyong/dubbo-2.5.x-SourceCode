@@ -30,7 +30,7 @@ import java.util.Map;
  *
  * @serial Don't change the class name and properties.
  */
-// TODO 真正需要徐序列化然后传送的就是这个RpcInvocation
+// TODO 真正需要序列化然后传送的就是这个RpcInvocation
 public class RpcInvocation implements Invocation, Serializable {
 
     private static final long serialVersionUID = -4355285085441097045L;

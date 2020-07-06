@@ -42,7 +42,7 @@ public class JavassistProxyFactory extends AbstractProxyFactory {
             //重写抽象方法 返回RpcResult
             @Override
             protected Object doInvoke(T proxy, String methodName, Class<?>[] parameterTypes, Object[] arguments) throws Throwable {
-                // TODO 调用客户端请求方法，响应客户端请求
+                // TODO 下一步就是调用客户端请求方法，也就是执行到我们自己写的实现类方法，然后响应客户端请求
                 return wrapper.invokeMethod(proxy, methodName, parameterTypes, arguments);
             }
         };

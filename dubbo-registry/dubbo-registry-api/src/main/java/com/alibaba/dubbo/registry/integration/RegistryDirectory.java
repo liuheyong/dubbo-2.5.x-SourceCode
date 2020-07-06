@@ -86,10 +86,10 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
      */
     private volatile List<Configurator> configurators; // The initial value is null and the midway may be assigned to null, please use the local variable reference
 
-    // Map<url, Invoker> cache service url to invoker mapping.
-    private volatile Map<String, Invoker<T>> urlInvokerMap; // The initial value is null and the midway may be assigned to null, please use the local variable reference
+    // TODO 将Map <URL，Invoker>缓存服务URL到调用者映射。
+    private volatile Map<String, Invoker<T>> urlInvokerMap; // 初始值为null，并且中途可能会分配为null，请使用局部变量引用
 
-    // Map<methodName, Invoker> cache service method to invokers mapping.
+    // TODO  将Map <methodName，Invoker>缓存服务方法映射到调用者映射.
     private volatile Map<String, List<Invoker<T>>> methodInvokerMap; // The initial value is null and the midway may be assigned to null, please use the local variable reference
 
     // Set<invokerUrls> cache invokeUrls to invokers mapping.
@@ -179,6 +179,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
         }
     }
 
+    // TODO 这里面的操作就是根据传入的url进行创建或者更新invoker
     public synchronized void notify(List<URL> urls) {
         List<URL> invokerUrls = new ArrayList<URL>();
         List<URL> routerUrls = new ArrayList<URL>();
@@ -217,7 +218,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
                 this.overrideDirectoryUrl = configurator.configure(overrideDirectoryUrl);
             }
         }
-        // providers
+        // TODO 刷新客户端Invoker
         refreshInvoker(invokerUrls);
     }
 
@@ -328,7 +329,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
     }
 
     /**
-     * Turn urls into invokers, and if url has been refer, will not re-reference.
+     * 将url转换为Invoker，如果已引用url，则不会重新引用.
      *
      * @param urls
      * @return invokers
@@ -438,6 +439,8 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
         return providerUrl;
     }
 
+    // TODO 过滤 Router分为两种，一种是条件ConditionRouter，表示满足某种条件才是
+    //   我们需要的Router,另外一种是ScriptRouter，通过具体的表达式判断，应用不广泛。
     private List<Invoker<T>> route(List<Invoker<T>> invokers, String method) {
         Invocation invocation = new RpcInvocation(method, new Class<?>[0], new Object[0]);
         List<Router> routers = getRouters();

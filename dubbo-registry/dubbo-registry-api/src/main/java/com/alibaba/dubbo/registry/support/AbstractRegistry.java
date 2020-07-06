@@ -293,7 +293,7 @@ public abstract class AbstractRegistry implements Registry {
         }
         Set<NotifyListener> listeners = subscribed.get(url);
         if (listeners == null) {
-            subscribed.putIfAbsent(url, new ConcurrentHashSet<NotifyListener>());
+            subscribed.putIfAbsent(url, new ConcurrentHashSet<>());
             listeners = subscribed.get(url);
         }
         listeners.add(listener);
@@ -371,8 +371,7 @@ public abstract class AbstractRegistry implements Registry {
         if (listener == null) {
             throw new IllegalArgumentException("notify listener == null");
         }
-        if ((urls == null || urls.size() == 0)
-                && !Constants.ANY_VALUE.equals(url.getServiceInterface())) {
+        if ((urls == null || urls.size() == 0) && !Constants.ANY_VALUE.equals(url.getServiceInterface())) {
             logger.warn("Ignore empty notify urls for subscribe url " + url);
             return;
         }
@@ -404,6 +403,7 @@ public abstract class AbstractRegistry implements Registry {
             List<URL> categoryList = entry.getValue();
             categoryNotified.put(category, categoryList);
             saveProperties(url);
+            //这里的listener就是我们之前在接口中传入的RegistryDirectory的实例对象，所以调用的就是他的notify方法。
             listener.notify(categoryList);
         }
     }
