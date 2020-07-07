@@ -69,7 +69,7 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
     * @Date:  2020-07-01
     * @Param:  [invocation]
     * @return:  com.alibaba.dubbo.rpc.Result
-    * @Description:
+    * @Description: // TODO 进行远程服务的调用
     */
     @Override
     protected Result doInvoke(final Invocation invocation) throws Throwable {
@@ -98,7 +98,7 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
             } else if (isAsync) {
                 //异步请求
                 ResponseFuture future = currentClient.request(inv, timeout);
-                RpcContext.getContext().setFuture(new FutureAdapter<Object>(future));
+                RpcContext.getContext().setFuture(new FutureAdapter<>(future));
                 return new RpcResult();
             } else {
                 //默认阻塞请求
@@ -126,13 +126,12 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
     }
 
     public void destroy() {
-        // in order to avoid closing a client multiple times, a counter is used in case of connection per jvm, every
-        // time when client.close() is called, counter counts down once, and when counter reaches zero, client will be
-        // closed.
+        // 为了避免多次关闭客户端，每个jvm连接时都使用一个计数器，
+        // 每次调用client.close（）时，计数器递减一次，当计数器达到零时，关闭。
         if (super.isDestroyed()) {
             return;
         } else {
-            // double check to avoid dup close
+            // 双重检查以避免重复
             destroyLock.lock();
             try {
                 if (super.isDestroyed()) {
@@ -149,7 +148,6 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
                         logger.warn(t.getMessage(), t);
                     }
                 }
-
             } finally {
                 destroyLock.unlock();
             }

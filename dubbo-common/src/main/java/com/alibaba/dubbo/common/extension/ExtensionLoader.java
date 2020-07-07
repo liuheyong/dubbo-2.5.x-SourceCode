@@ -63,30 +63,33 @@ public class ExtensionLoader<T> {
     //ExtensionLoader缓存
     private static final ConcurrentMap<Class<?>, ExtensionLoader<?>> EXTENSION_LOADERS = new ConcurrentHashMap<Class<?>, ExtensionLoader<?>>(32);
 
-    private static final ConcurrentMap<Class<?>, Object> EXTENSION_INSTANCES = new ConcurrentHashMap<Class<?>, Object>(16);
-
-    // ==============================  ==============================
-
     // TODO 接口类型
     private final Class<?> type;
 
     // TODO Dubbo 目前提供了两种 ExtensionFactory，分别是 SpiExtensionFactory 和 SpringExtensionFactory。
     //  前者用于创建自适应的拓展，后者是用于从 Spring 的 IOC 容器中获取所需的拓展。
     private final ExtensionFactory objectFactory;
+    // TODO 缓存SpiExtensionFactory 和 SpringExtensionFactory
+    private static final ConcurrentMap<Class<?>, Object> EXTENSION_INSTANCES = new ConcurrentHashMap<Class<?>, Object>(16);
 
+    // TODO 缓存配置文件中的接口的扩展实现类名称
     private final ConcurrentMap<Class<?>, String> cachedNames = new ConcurrentHashMap<Class<?>, String>(16);
 
+    // TODO 缓存配置文件中的接口的扩展实现类
     private final Holder<Map<String, Class<?>>> cachedClasses = new Holder<Map<String, Class<?>>>();
 
+    // TODO 缓存配置文件中的接口的实现类的代理类
     private final Map<String, Activate> cachedActivates = new ConcurrentHashMap<String, Activate>(16);
 
     private final ConcurrentMap<String, Holder<Object>> cachedInstances = new ConcurrentHashMap<String, Holder<Object>>(16);
 
     // ==============================@Adaptive放在类上==============================
-    // TODO @Adaptive如果方在类上，那么cachedAdaptiveClass就等于该类 Holder cachedAdaptiveInstance就包装这该类
+    // TODO @Adaptive如果放在类上，那么cachedAdaptiveClass就等于该类
     private volatile Class<?> cachedAdaptiveClass = null;
+    // TODO Holder cachedAdaptiveInstance就包装cachedAdaptiveClass这该类
     private final Holder<Object> cachedAdaptiveInstance = new Holder<Object>();
 
+    // TODO 接口的扩展实现类的默认名称，@SPI的value值。
     private String cachedDefaultName;
     private volatile Throwable createAdaptiveInstanceError;
 
@@ -105,6 +108,13 @@ public class ExtensionLoader<T> {
         return type.isAnnotationPresent(SPI.class);
     }
 
+    /**
+    * @Author: wenyixicodedog
+    * @Date:  2020-07-07
+    * @Param:  [type]
+    * @return:  com.alibaba.dubbo.common.extension.ExtensionLoader<T>
+    * @Description:  获取ExtensionLoader
+    */
     @SuppressWarnings("unchecked")
     public static <T> ExtensionLoader<T> getExtensionLoader(Class<T> type) {
         //如果为空、抛异常
@@ -115,9 +125,9 @@ public class ExtensionLoader<T> {
         }
         //如果type没有扩展的注解修饰、抛异常
         if (!withExtensionAnnotation(type)) {
-            throw new IllegalArgumentException("Extension type(" + type +
-                    ") is not extension, because WITHOUT @" + SPI.class.getSimpleName() + " Annotation!");
+            throw new IllegalArgumentException("Extension type(" + type + ") is not extension, because WITHOUT @" + SPI.class.getSimpleName() + " Annotation!");
         }
+        //从缓存map中取
         ExtensionLoader<T> loader = (ExtensionLoader<T>) EXTENSION_LOADERS.get(type);
         //如果为空，生成ExtensionLoader放入map当中
         if (loader == null) {
@@ -179,7 +189,7 @@ public class ExtensionLoader<T> {
     }
 
     /**
-     * Get activate extensions.
+     * 获取激活扩展
      *
      * @param url    url
      * @param values extension point names
@@ -188,29 +198,29 @@ public class ExtensionLoader<T> {
      * @see com.alibaba.dubbo.common.extension.Activate
      */
     public List<T> getActivateExtension(URL url, String[] values, String group) {
-        List<T> exts = new ArrayList<T>();
-        List<String> names = values == null ? new ArrayList<String>(0) : Arrays.asList(values);
+        List<T> exts = new ArrayList<>();
+        List<String> names = values == null ? new ArrayList<>(0) : Arrays.asList(values);
         if (!names.contains(Constants.REMOVE_VALUE_PREFIX + Constants.DEFAULT_KEY)) {
+            // TODO 加载配置路径下的接口的实现类。
             getExtensionClasses();
             for (Map.Entry<String, Activate> entry : cachedActivates.entrySet()) {
                 String name = entry.getKey();
                 Activate activate = entry.getValue();
                 if (isMatchGroup(group, activate.group())) {
                     T ext = getExtension(name);
-                    if (!names.contains(name)
-                            && !names.contains(Constants.REMOVE_VALUE_PREFIX + name)
-                            && isActive(activate, url)) {
+                    if (!names.contains(name) && !names.contains(Constants.REMOVE_VALUE_PREFIX + name) && isActive(activate, url)) {
                         exts.add(ext);
                     }
                 }
             }
+            // TODO 对exts这个list进行排序，排序规则是自己定义的一种优先级顺序
             Collections.sort(exts, ActivateComparator.COMPARATOR);
         }
-        List<T> usrs = new ArrayList<T>();
+        // TODO 接下来就是对指定的names进行获取扩展类放入exts中
+        List<T> usrs = new ArrayList<>();
         for (int i = 0; i < names.size(); i++) {
             String name = names.get(i);
-            if (!name.startsWith(Constants.REMOVE_VALUE_PREFIX)
-                    && !names.contains(Constants.REMOVE_VALUE_PREFIX + name)) {
+            if (!name.startsWith(Constants.REMOVE_VALUE_PREFIX) && !names.contains(Constants.REMOVE_VALUE_PREFIX + name)) {
                 if (Constants.DEFAULT_KEY.equals(name)) {
                     if (usrs.size() > 0) {
                         exts.addAll(0, usrs);
@@ -274,7 +284,7 @@ public class ExtensionLoader<T> {
             throw new IllegalArgumentException("Extension name == null");
         Holder<Object> holder = cachedInstances.get(name);
         if (holder == null) {
-            cachedInstances.putIfAbsent(name, new Holder<Object>());
+            cachedInstances.putIfAbsent(name, new Holder<>());
             holder = cachedInstances.get(name);
         }
         return (T) holder.get();
@@ -581,7 +591,7 @@ public class ExtensionLoader<T> {
         return clazz;
     }
 
-    //getExtensionClasses加载含有@Adaptive的扩展点实现类
+    //getExtensionClasses加载扩展点实现类
     private Map<String, Class<?>> getExtensionClasses() {
         Map<String, Class<?>> classes = cachedClasses.get();
         if (classes == null) {
@@ -596,7 +606,6 @@ public class ExtensionLoader<T> {
         return classes;
     }
 
-    // synchronized in getExtensionClasses
     // TODO  loadExtensionClasses方法判断ExtensionLoader类中的传入的type接口是否标注了SPI注解，
     //   并获取SPI注解的值，这个值为接口的默认实现标记
     private Map<String, Class<?>> loadExtensionClasses() {
@@ -606,16 +615,17 @@ public class ExtensionLoader<T> {
             String value = defaultAnnotation.value();
             if (value != null && (value = value.trim()).length() > 0) {
                 String[] names = NAME_SEPARATOR.split(value);
+                // TODO @SPI的value值(如果有)有且只能有一个
                 if (names.length > 1) {
-                    throw new IllegalStateException("more than 1 default extension name on extension " + type.getName()
-                            + ": " + Arrays.toString(names));
+                    throw new IllegalStateException("more than 1 default extension name on extension " + type.getName() + ": " + Arrays.toString(names));
                 }
+                // TODO value值(默认值)赋值给cachedDefaultName
                 if (names.length == 1) cachedDefaultName = names[0];
             }
         }
 
-        Map<String, Class<?>> extensionClasses = new HashMap<String, Class<?>>(4);
-        // TODO loadFile方法用来加载配置路径下的接口的实现类。比如在调用loadFile方法时，传入的参数 DUBBO_INTERNAL_DIRECTORY 描述了接口实现类配置文件路径
+        Map<String, Class<?>> extensionClasses = new HashMap<>(4);
+        // TODO loadFile方法用来加载配置路径下的接口的实现类。
         loadFile(extensionClasses, DUBBO_INTERNAL_DIRECTORY);
         loadFile(extensionClasses, DUBBO_DIRECTORY);
         loadFile(extensionClasses, SERVICES_DIRECTORY);

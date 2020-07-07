@@ -14,7 +14,7 @@ public class Robot$Adaptive implements com.alibaba.dubbo.demo.provider.javaspi.R
         com.alibaba.dubbo.common.URL url = arg0;
         String extName = url.getParameter("robot");
         if (extName == null)
-            throw new IllegalStateException("Fail to get extension(com.alibaba.dubbo.demo.provider.javaspi.Robot) name from url(" + url.toString() + ") use keys([robot])");
+            throw new IllegalStateException("Fail to get extension(com.alibaba.dubbo.demo.provider.activate.Robot) name from url(" + url.toString() + ") use keys([robot])");
         com.alibaba.dubbo.demo.provider.javaspi.Robot extension =
                 ExtensionLoader.getExtensionLoader(com.alibaba.dubbo.demo.provider.javaspi.Robot.class).getExtension(extName);
         extension.sayHello(arg0);

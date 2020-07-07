@@ -42,13 +42,16 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
+// TODO @Activate称为自动激活扩展点注解，主要使用在有多个扩展点实现、需要同时根据不同条件被激活的场景中
 public @interface Activate {
+
     /**
      * Activate the current extension when one of the groups matches. The group passed into
      * {@link ExtensionLoader#getActivateExtension(URL, String, String)} will be used for matching.
      *
      * @return group names to match
      * @see ExtensionLoader#getActivateExtension(URL, String, String)
+     * // TODO 分组如果匹配则激活
      */
     String[] group() default {};
 
@@ -62,6 +65,7 @@ public @interface Activate {
      * @return URL parameter keys
      * @see ExtensionLoader#getActivateExtension(URL, String)
      * @see ExtensionLoader#getActivateExtension(URL, String, String)
+     * // TODO URL有该key值，则激活
      */
     String[] value() default {};
 
@@ -69,6 +73,7 @@ public @interface Activate {
      * Relative ordering info, optional
      *
      * @return extension list which should be put before the current one
+     * // TODO 哪些扩展点要在本扩展点之前激活
      */
     String[] before() default {};
 
@@ -76,6 +81,7 @@ public @interface Activate {
      * Relative ordering info, optional
      *
      * @return extension list which should be put after the current one
+     * // TODO 哪些扩展点要在本扩展点之后激活
      */
     String[] after() default {};
 
@@ -83,6 +89,7 @@ public @interface Activate {
      * Absolute ordering info, optional
      *
      * @return absolute ordering info
+     * // TODO 同一组里面的排序，序号越小优先级越高
      */
     int order() default 0;
 }
