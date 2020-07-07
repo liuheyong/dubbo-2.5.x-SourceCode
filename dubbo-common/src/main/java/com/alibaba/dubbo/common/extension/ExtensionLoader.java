@@ -822,20 +822,24 @@ public class ExtensionLoader<T> {
     //  既然要动态生成代理，说明没有@Adaptive注解修饰的类，否则直接生成实例就返回了
     private String createAdaptiveExtensionClassCode() {
         StringBuilder codeBuilder = new StringBuilder();
-        // 获取所有的公共方法
+        // 获取所有的公共方法 通过反射获取所有的方法
         Method[] methods = type.getMethods();
         boolean hasAdaptiveAnnotation = false;
+        // 遍历方法列表
         for (Method m : methods) {
-            //遍历所有方法，至少有一个方法有Adaptive的注解，否则报错
+            // 检测方法上是否有 Adaptive 注解
             if (m.isAnnotationPresent(Adaptive.class)) {
                 hasAdaptiveAnnotation = true;
                 break;
             }
         }
-        // no need to generate adaptive class since there's no adaptive method found.
         if (!hasAdaptiveAnnotation)
+            // 若所有的方法上均无 Adaptive 注解，则抛出异常
             throw new IllegalStateException("No adaptive method on extension " + type.getName() + ", refuse to create the adaptive class!");
 
+        //通过 Adaptive 注解检测后，即可开始生成代码。
+        //代码生成的顺序与 Java 文件内容顺序一致，首先会生成
+        //package 语句，然后生成 import 语句，紧接着生成类名等代码。
         codeBuilder.append("package " + type.getPackage().getName() + ";");
         codeBuilder.append("\nimport " + ExtensionLoader.class.getName() + ";");
         codeBuilder.append("\npublic class " + type.getSimpleName() + "$Adaptive" + " implements " + type.getCanonicalName() + " {");
@@ -848,7 +852,11 @@ public class ExtensionLoader<T> {
             //获取Adaptive的注解
             Adaptive adaptiveAnnotation = method.getAnnotation(Adaptive.class);
             StringBuilder code = new StringBuilder(512);
+            // 如果方法上无 Adaptive 注解，则生成 throw new UnsupportedOperationException(...) 代码
             if (adaptiveAnnotation == null) {
+                // 生成的代码格式如下：
+                // throw new UnsupportedOperationException(
+                //     "method " + 方法签名 + of interface + 全限定接口名 + is not adaptive method!”)
                 code.append("throw new UnsupportedOperationException(\"method ")
                         .append(method.toString()).append(" of interface ")
                         .append(type.getName()).append(" is not adaptive method!\");");
@@ -860,9 +868,11 @@ public class ExtensionLoader<T> {
                         break;
                     }
                 }
-                // found parameter in URL type
+                // urlTypeIndex != -1，表示参数列表中存在 URL 参数
                 if (urlTypeIndex != -1) {
-                    // Null Point check
+                    // 为 URL 类型参数生成判空代码，格式如下：
+                    // if (arg + urlTypeIndex == null)
+                    //     throw new IllegalArgumentException("url == null");
                     String s = String.format("\nif (arg%d == null) throw new IllegalArgumentException(\"url == null\");",
                             urlTypeIndex);
                     code.append(s);
@@ -870,13 +880,14 @@ public class ExtensionLoader<T> {
                     s = String.format("\n%s url = arg%d;", URL.class.getName(), urlTypeIndex);
                     code.append(s);
                 }
-                // did not find parameter in URL type
+                // 参数列表中不存在 URL 类型参数
                 else {
                     String attribMethod = null;
-
                     // find URL getter method
                     LBL_PTS:
+                    // 遍历方法的参数类型列表
                     for (int i = 0; i < pts.length; ++i) {
+                        // 遍历方法列表，寻找可返回 URL 的 getter 方法
                         Method[] ms = pts[i].getMethods();
                         for (Method m : ms) {
                             String name = m.getName();
