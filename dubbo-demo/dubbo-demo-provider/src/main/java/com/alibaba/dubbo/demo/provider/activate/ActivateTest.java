@@ -33,10 +33,10 @@ public class ActivateTest {
         //bumblebee.sayHello();
 
         //================================Java Activate================================
-        ExtensionLoader<Robot> extExtensionLoader = ExtensionLoader.getExtensionLoader(Robot.class);
-        URL url = URL.valueOf("test://localhost/test?activateKey2=activateValue");
-        List<Robot> list = extExtensionLoader.getActivateExtension(url, new String[]{}, "order");
-        list.forEach(o -> o.sayHello(o.getClass().getSimpleName()));
+        //ExtensionLoader<Robot> extExtensionLoader = ExtensionLoader.getExtensionLoader(Robot.class);
+        //URL url = URL.valueOf("test://localhost/test?activateKey2=activateValue");
+        //List<Robot> list = extExtensionLoader.getActivateExtension(url, new String[]{}, "order");
+        //list.forEach(o -> o.sayHello(o.getClass().getSimpleName()));
 
     }
 

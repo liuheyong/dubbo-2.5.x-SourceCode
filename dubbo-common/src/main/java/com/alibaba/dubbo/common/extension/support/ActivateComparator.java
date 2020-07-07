@@ -52,13 +52,11 @@ public class ActivateComparator implements Comparator<Object> {
             if (a1.before().length > 0 || a1.after().length > 0) {
                 String n2 = extensionLoader.getExtensionName(o2.getClass());
                 for (String before : a1.before()) {
-                    //o1 在 o2 之前
                     if (before.equals(n2)) {
                         return -1;
                     }
                 }
                 for (String after : a1.after()) {
-                    //o2 在 o1 之前
                     if (after.equals(n2)) {
                         return 1;
                     }
@@ -68,13 +66,11 @@ public class ActivateComparator implements Comparator<Object> {
                 String n1 = extensionLoader.getExtensionName(o1.getClass());
                 for (String before : a2.before()) {
                     if (before.equals(n1)) {
-                        //o2 在 o1 之前
                         return 1;
                     }
                 }
                 for (String after : a2.after()) {
                     if (after.equals(n1)) {
-                        //o1 在 o2 之前
                         return -1;
                     }
                 }
