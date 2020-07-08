@@ -91,7 +91,7 @@ public class RmiProtocolTest {
     // FIXME RMI protocol doesn't support casting to EchoService yet.
     @Ignore
     @Test
-    public void testRmiProtocol_echoService() throws Exception {
+    public void testRmiProtocol_echoService() throws Throwable {
         DemoService service = new DemoServiceImpl();
         Exporter<?> rpcExporter = protocol.export(proxy.getInvoker(service, DemoService.class, URL.valueOf("rmi://127.0.0.1:9002/TestService")));
 
