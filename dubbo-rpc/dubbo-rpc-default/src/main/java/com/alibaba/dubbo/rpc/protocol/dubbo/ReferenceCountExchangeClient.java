@@ -38,13 +38,13 @@ final class ReferenceCountExchangeClient implements ExchangeClient {
     private final URL url;
     private final AtomicInteger refenceCount = new AtomicInteger(0);
 
-    //    private final ExchangeHandler handler;
+    // private final ExchangeHandler handler;
     private final ConcurrentMap<String, LazyConnectExchangeClient> ghostClientMap;
     private ExchangeClient client;
 
-
     public ReferenceCountExchangeClient(ExchangeClient client, ConcurrentMap<String, LazyConnectExchangeClient> ghostClientMap) {
         this.client = client;
+        // 引用计数自增
         refenceCount.incrementAndGet();
         this.url = client.getUrl();
         if (ghostClientMap == null) {
@@ -58,6 +58,7 @@ final class ReferenceCountExchangeClient implements ExchangeClient {
     }
 
     public ResponseFuture request(Object request) throws RemotingException {
+        // TODO  直接调用被装饰对象HeaderExchangeClient的同签名方法
         return client.request(request);
     }
 

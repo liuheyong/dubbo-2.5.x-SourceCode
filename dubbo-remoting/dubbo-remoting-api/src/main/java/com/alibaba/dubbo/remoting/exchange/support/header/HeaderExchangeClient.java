@@ -58,7 +58,9 @@ public class HeaderExchangeClient implements ExchangeClient {
             throw new IllegalArgumentException("client == null");
         }
         this.client = client;
+        // 创建 HeaderExchangeChannel 对象
         this.channel = new HeaderExchangeChannel(client);
+        // 以下代码均与心跳检测逻辑有关
         String dubbo = client.getUrl().getParameter(Constants.DUBBO_VERSION_KEY);
         this.heartbeat = client.getUrl().getParameter(Constants.HEARTBEAT_KEY, dubbo != null && dubbo.startsWith("1.0.") ? Constants.DEFAULT_HEARTBEAT : 0);
         this.heartbeatTimeout = client.getUrl().getParameter(Constants.HEARTBEAT_TIMEOUT_KEY, heartbeat * 3);
@@ -66,11 +68,13 @@ public class HeaderExchangeClient implements ExchangeClient {
             throw new IllegalStateException("heartbeatTimeout < heartbeatInterval * 2");
         }
         if (needHeartbeat) {
+            // 开启心跳检测定时器
             startHeatbeatTimer();
         }
     }
 
     public ResponseFuture request(Object request) throws RemotingException {
+        // 直接调用 HeaderExchangeChannel 对象的同签名方法
         return channel.request(request);
     }
 

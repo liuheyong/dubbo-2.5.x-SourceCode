@@ -41,6 +41,7 @@ final class HeaderExchangeChannel implements ExchangeChannel {
 
     private static final String CHANNEL_KEY = HeaderExchangeChannel.class.getName() + ".CHANNEL";
 
+    // TODO  这里的 channel 指向的是 NettyClient
     private final Channel channel;
 
     private volatile boolean closed = false;
@@ -101,13 +102,18 @@ final class HeaderExchangeChannel implements ExchangeChannel {
         if (closed) {
             throw new RemotingException(this.getLocalAddress(), null, "Failed to send request " + request + ", cause: The channel " + this + " is closed!");
         }
-        // create request.
+        // 创建 Request 对象
         Request req = new Request();
         req.setVersion("2.0.0");
+        // 设置双向通信标志为 true
         req.setTwoWay(true);
+        // 这里的 request 变量类型为 RpcInvocation
         req.setData(request);
+        // 创建 DefaultFuture 对象
         DefaultFuture future = new DefaultFuture(channel, req, timeout);
         try {
+            // TODO  调用 NettyClient 的 send 方法发送请求 需要说明的是，
+            //  NettyClient 中并未实现 send 方法，该方法继承自父类 AbstractPeer，下面直接分析 AbstractPeer 的代码。
             channel.send(req);
         } catch (RemotingException e) {
             future.cancel();

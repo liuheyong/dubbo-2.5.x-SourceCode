@@ -39,6 +39,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * DefaultFuture.
  */
+// TODO DefaultFuture是ResponseFuture的默认实现，用于接收服务端返回的数据执行结果
 public class DefaultFuture implements ResponseFuture {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultFuture.class);
@@ -53,7 +54,7 @@ public class DefaultFuture implements ResponseFuture {
         th.start();
     }
 
-    // invoke id.
+    // 获取请求 id，这个 id 很重要，后面还会见到
     private final long id;
     private final Channel channel;
     private final Request request;
@@ -70,7 +71,7 @@ public class DefaultFuture implements ResponseFuture {
         this.request = request;
         this.id = request.getId();
         this.timeout = timeout > 0 ? timeout : channel.getUrl().getPositiveParameter(Constants.TIMEOUT_KEY, Constants.DEFAULT_TIMEOUT);
-        // put into waiting map.
+        // 存储 <requestId, DefaultFuture> 映射关系到 FUTURES 中
         FUTURES.put(id, this);
         CHANNELS.put(id, channel);
     }
@@ -111,16 +112,27 @@ public class DefaultFuture implements ResponseFuture {
         return get(timeout);
     }
 
+    /**
+    * @Author: wenyixicodedog
+    * @Date:  2020-07-08
+    * @Param:
+    * @return:
+    * @Description:  // TODO 获取服务端返回的结果
+    */
     public Object get(int timeout) throws RemotingException {
         if (timeout <= 0) {
             timeout = Constants.DEFAULT_TIMEOUT;
         }
+        // 检测服务提供方是否成功返回了调用结果
         if (!isDone()) {
             long start = System.currentTimeMillis();
             lock.lock();
             try {
+                // 循环检测服务提供方是否成功返回了调用结果
                 while (!isDone()) {
+                    // 如果调用结果尚未返回，这里等待一段时间
                     done.await(timeout, TimeUnit.MILLISECONDS);
+                    // 如果调用结果成功返回，或等待超时，此时跳出 while 循环，执行后续的逻辑
                     if (isDone() || System.currentTimeMillis() - start > timeout) {
                         break;
                     }
@@ -130,6 +142,7 @@ public class DefaultFuture implements ResponseFuture {
             } finally {
                 lock.unlock();
             }
+            // 如果调用结果仍未返回，则抛出超时异常
             if (!isDone()) {
                 throw new TimeoutException(sent > 0, channel, getTimeoutMessage(false));
             }
@@ -146,6 +159,7 @@ public class DefaultFuture implements ResponseFuture {
     }
 
     public boolean isDone() {
+        // 通过检测 response 字段为空与否，判断是否收到了调用结果
         return response != null;
     }
 
@@ -204,6 +218,7 @@ public class DefaultFuture implements ResponseFuture {
         }
     }
 
+    // TODO  如果调用结果的状态为 Response.OK，则表示调用过程正常，服务提供方成功返回了调用结果
     private Object returnFromResponse() throws RemotingException {
         Response res = response;
         if (res == null) {

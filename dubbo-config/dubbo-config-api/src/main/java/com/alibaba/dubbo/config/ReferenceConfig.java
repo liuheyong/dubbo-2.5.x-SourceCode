@@ -91,8 +91,12 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
 
     private String protocol;
 
-    // interface proxy reference
+    // 合并后的 Invoker 实例已经具备调用本地或远程服务的能力了，
+    // 但并不能将此实例暴露给用户使用，这会对用户业务代码造成侵入。此时
+    // 框架还需要通过代理工厂类 (ProxyFactory) 为服务接口生成代理类，
+    // 并让代理类去调用 Invoker 逻辑。避免了 Dubbo 框架代码对业务代码的侵入，同时也让框架更容易使用
     private transient volatile T ref;
+
     private transient volatile Invoker<?> invoker;
     private transient volatile boolean initialized;
     private transient volatile boolean destroyed;
@@ -170,7 +174,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
             throw new IllegalStateException("Already destroyed!");
         }
         if (ref == null) {
-            // ref为空时就开始初始化象
+            // ref为空时就开始初始化
             init();
         }
         return ref;
@@ -431,7 +435,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
         if (logger.isInfoEnabled()) {
             logger.info("Refer dubbo service " + interfaceClass.getName() + " from url " + invoker.getUrl());
         }
-        // TODO  ②、创建服务代理
+        // TODO  ②、创建服务代理 Invoker 创建完毕后，接下来要做的事情是为服务接口生成代理对象。有了代理对象，即可进行远程调用。
         return (T) proxyFactory.getProxy(invoker);
     }
 

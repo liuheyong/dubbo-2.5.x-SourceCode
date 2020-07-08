@@ -56,6 +56,7 @@ final class NettyChannel extends AbstractChannel {
         if (ch == null) {
             return null;
         }
+        // 尝试从集合中获取 NettyChannel 实例
         NettyChannel ret = channelMap.get(ch);
         if (ret == null) {
             NettyChannel nc = new NettyChannel(ch, url, handler);
@@ -93,9 +94,16 @@ final class NettyChannel extends AbstractChannel {
         boolean success = true;
         int timeout = 0;
         try {
+            // TODO  发送消息(包含请求和响应消息) 在 Netty 中，出站数据在发出之前还需要进行编码操作。
+            //  最终发送消息
             ChannelFuture future = channel.write(message);
             if (sent) {
+                // sent 的值源于 <dubbo:method sent="true/false" /> 中 sent 的配置值，有两种配置值：
+                //   1. true: 等待消息发出，消息发送失败将抛出异常
+                //   2. false: 不等待消息发出，将消息放入 IO 队列，即刻返回
+                // 默认情况下 sent = false；
                 timeout = getUrl().getPositiveParameter(Constants.TIMEOUT_KEY, Constants.DEFAULT_TIMEOUT);
+                // 等待消息发出，若在规定时间没能发出，success 会被置为 false
                 success = future.await(timeout);
             }
             Throwable cause = future.getCause();
@@ -105,12 +113,30 @@ final class NettyChannel extends AbstractChannel {
         } catch (Throwable e) {
             throw new RemotingException(this, "Failed to send message " + message + " to " + getRemoteAddress() + ", cause: " + e.getMessage(), e);
         }
-
+        // 若 success 为 false，这里抛出异常
         if (!success) {
             throw new RemotingException(this, "Failed to send message " + message + " to " + getRemoteAddress()
                     + "in timeout(" + timeout + "ms) limit");
         }
     }
+    // TODO 经历多次调用，到这里请求数据的发送过程就结束了，过程漫长。为了便于大家阅读代码，
+    //   这里以 DemoService 为例，将 sayHello 方法的整个调用路径贴出来。
+    //proxy0#sayHello(String)
+    //  —> InvokerInvocationHandler#invoke(Object, Method, Object[])
+    //    —> MockClusterInvoker#invoke(Invocation)
+    //      —> AbstractClusterInvoker#invoke(Invocation)
+    //        —> FailoverClusterInvoker#doInvoke(Invocation, List<Invoker<T>>, LoadBalance)
+    //          —> Filter#invoke(Invoker, Invocation)  // 包含多个 Filter 调用
+    //            —> ListenerInvokerWrapper#invoke(Invocation)
+    //              —> AbstractInvoker#invoke(Invocation)
+    //                —> DubboInvoker#doInvoke(Invocation)
+    //                  —> ReferenceCountExchangeClient#request(Object, int)
+    //                    —> HeaderExchangeClient#request(Object, int)
+    //                      —> HeaderExchangeChannel#request(Object, int)
+    //                        —> AbstractPeer#send(Object)
+    //                          —> AbstractClient#send(Object, boolean)
+    //                            —> NettyChannel#send(Object, boolean)
+    //                              —> NioClientSocketChannel#write(Object)
 
     public void close() {
         try {

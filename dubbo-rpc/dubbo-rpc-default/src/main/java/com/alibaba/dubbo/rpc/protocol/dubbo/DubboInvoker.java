@@ -69,40 +69,53 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
     * @Date:  2020-07-01
     * @Param:  [invocation]
     * @return:  com.alibaba.dubbo.rpc.Result
-    * @Description: // TODO 进行远程服务的调用
+    * @Description: // TODO 最后一步进行远程服务的调用的方法
     */
     @Override
     protected Result doInvoke(final Invocation invocation) throws Throwable {
         RpcInvocation inv = (RpcInvocation) invocation;
         final String methodName = RpcUtils.getMethodName(invocation);
+        // 设置 path 和 version 到 attachment 中
         inv.setAttachment(Constants.PATH_KEY, getUrl().getPath());
         inv.setAttachment(Constants.VERSION_KEY, version);
 
         //客户端
         ExchangeClient currentClient;
         if (clients.length == 1) {
+            // 从 clients 数组中获取 ExchangeClient
             currentClient = clients[0];
         } else {
             currentClient = clients[index.getAndIncrement() % clients.length];
         }
+        // TODO  =========================开始进行服务端接口的调用(还没有开始发送请求，send才是最终发送请求)=========================
         try {
+            // 获取异步配置
             boolean isAsync = RpcUtils.isAsync(getUrl(), invocation);
             boolean isOneway = RpcUtils.isOneway(getUrl(), invocation);
             int timeout = getUrl().getMethodParameter(methodName, Constants.TIMEOUT_KEY, Constants.DEFAULT_TIMEOUT);
-            //只负责发送消息，不需要等待反馈接口
+            // isOneway 为 true，表示“单向”通信
+            // TODO  异步无返回值
             if (isOneway) {
                 boolean isSent = getUrl().getMethodParameter(methodName, Constants.SENT_KEY, false);
+                // 发送请求
                 currentClient.send(inv, isSent);
+                // 设置上下文中的 future 字段为 null
                 RpcContext.getContext().setFuture(null);
+                // 返回一个空的 RpcResult
                 return new RpcResult();
+            // TODO  异步有返回值
             } else if (isAsync) {
-                //异步请求
+                // 发送请求，并得到一个 ResponseFuture 实例
                 ResponseFuture future = currentClient.request(inv, timeout);
+                // 设置 future 到上下文中
                 RpcContext.getContext().setFuture(new FutureAdapter<>(future));
+                // 暂时返回一个空结果
                 return new RpcResult();
+            // TODO  同步调用
             } else {
                 //默认阻塞请求
                 RpcContext.getContext().setFuture(null);
+                // 发送请求，得到一个 ResponseFuture 实例，并调用该实例的 get 方法进行等待
                 return (Result) currentClient.request(inv, timeout).get();
             }
         } catch (TimeoutException e) {

@@ -42,6 +42,7 @@ public class NettyHandler extends SimpleChannelHandler {
 
     private final URL url;
 
+    // TODO  这里的 handler 类型为 NettyServer
     private final ChannelHandler handler;
 
     public NettyHandler(URL url, ChannelHandler handler) {
@@ -92,6 +93,7 @@ public class NettyHandler extends SimpleChannelHandler {
     */
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+        // 获取 NettyChannel
         NettyChannel channel = NettyChannel.getOrAddChannel(ctx.getChannel(), url, handler);
         try {
             handler.received(channel, e.getMessage());

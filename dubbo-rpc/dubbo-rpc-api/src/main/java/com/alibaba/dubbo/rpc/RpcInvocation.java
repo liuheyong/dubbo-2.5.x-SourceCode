@@ -28,9 +28,9 @@ import java.util.Map;
 /**
  * RPC Invocation.
  *
- * @serial Don't change the class name and properties.
+ * @serial
  */
-// TODO 真正需要序列化然后传送的就是这个RpcInvocation
+// TODO 真正需要序列化然后传送的就是这个RpcInvocation 不要更改类名称和属性。
 public class RpcInvocation implements Invocation, Serializable {
 
     private static final long serialVersionUID = -4355285085441097045L;
