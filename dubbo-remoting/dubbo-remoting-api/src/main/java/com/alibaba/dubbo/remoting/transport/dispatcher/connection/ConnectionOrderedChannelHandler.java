@@ -36,6 +36,13 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @Author: wenyixicodedog
+ * @Date:  2020-07-09
+ * @Param:
+ * @return:
+ * @Description:  在 IO 线程上，将连接断开事件放入队列，有序逐个执行，其它消息派发到线程池
+ */
 public class ConnectionOrderedChannelHandler extends WrappedChannelHandler {
 
     protected final ThreadPoolExecutor connectionExecutor;

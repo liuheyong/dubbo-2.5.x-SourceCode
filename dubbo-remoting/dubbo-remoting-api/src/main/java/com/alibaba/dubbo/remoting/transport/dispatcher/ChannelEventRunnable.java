@@ -21,7 +21,16 @@ import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.alibaba.dubbo.remoting.Channel;
 import com.alibaba.dubbo.remoting.ChannelHandler;
 
+/**
+* @Author: wenyixicodedog
+* @Date:  2020-07-09
+* @Param:
+* @return:
+* @Description:  开启线程执行业务逻辑
+* 请求对象会被封装 ChannelEventRunnable 中，ChannelEventRunnable 将会是服务端调用过程的新起点。
+*/
 public class ChannelEventRunnable implements Runnable {
+
     private static final Logger logger = LoggerFactory.getLogger(ChannelEventRunnable.class);
 
     private final ChannelHandler handler;
@@ -50,7 +59,16 @@ public class ChannelEventRunnable implements Runnable {
         this.exception = exception;
     }
 
+    /**
+    * @Author: wenyixicodedog
+    * @Date:  2020-07-09
+    * @Param:
+    * @return:
+    * @Description:  ChannelEventRunnable 仅是一个中转站，它的 run 方法中并不包含具体的调用逻辑，
+     * 仅用于将参数传给其他 ChannelHandler 对象进行处理，该对象类型为 DecodeHandler。
+    */
     public void run() {
+        // 检测通道状态，对于请求或响应消息，此时 state = RECEIVED
         switch (state) {
             case CONNECTED:
                 try {
@@ -74,6 +92,7 @@ public class ChannelEventRunnable implements Runnable {
                             + ", message is " + message, e);
                 }
                 break;
+            //请求和响应消息出现频率明显比其他类型消息高，所以新版dubbo对RECEIVED单独拿出来作为一个处理方式放在switch前面。
             case RECEIVED:
                 try {
                     handler.received(channel, message);

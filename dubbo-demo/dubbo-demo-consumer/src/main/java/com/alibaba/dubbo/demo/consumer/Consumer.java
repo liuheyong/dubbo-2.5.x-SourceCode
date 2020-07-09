@@ -24,16 +24,16 @@ import java.util.concurrent.Executors;
 
 public class Consumer {
 
-    private static ExecutorService service = Executors.newFixedThreadPool(12);
+    public static ExecutorService service = Executors.newFixedThreadPool(12);
 
     public static void main(String[] args) {
         System.setProperty("java.net.preferIPv4Stack", "true");
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"META-INF/spring/dubbo-demo" + "-consumer.xml"});
         context.start();
         DemoService demoService = (DemoService) context.getBean("demoService"); // get remote service proxy
-        for (int i = 0; i < 10; i++) {
-            service.execute(() -> System.out.println(demoService.sayBye("liuheyong")));
-        }
+        //for (int i = 0; i < 10; i++) {
+            service.execute(() -> System.out.println(demoService.sayBye("wenyixicodedog")));
+        //}
 
         //while (true) {
         //    try {

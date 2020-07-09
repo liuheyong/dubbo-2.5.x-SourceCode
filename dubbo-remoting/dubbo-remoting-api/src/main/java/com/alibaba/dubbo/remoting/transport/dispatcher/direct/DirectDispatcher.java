@@ -21,7 +21,11 @@ import com.alibaba.dubbo.remoting.ChannelHandler;
 import com.alibaba.dubbo.remoting.Dispatcher;
 
 /**
- * Direct dispatcher
+ * @Author: wenyixicodedog
+ * @Date:  2020-07-09
+ * @Param:
+ * @return:
+ * @Description:  所有消息都不派发到线程池，全部在 IO 线程上直接执行
  */
 public class DirectDispatcher implements Dispatcher {
 

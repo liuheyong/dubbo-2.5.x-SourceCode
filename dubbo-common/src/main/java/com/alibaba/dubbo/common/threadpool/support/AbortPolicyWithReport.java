@@ -33,8 +33,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * Abort Policy.
- * Log warn info when abort.
+ * 中止策略。
  */
 public class AbortPolicyWithReport extends ThreadPoolExecutor.AbortPolicy {
 
@@ -53,6 +52,13 @@ public class AbortPolicyWithReport extends ThreadPoolExecutor.AbortPolicy {
         this.url = url;
     }
 
+    /**
+    * @Author: wenyixicodedog
+    * @Date:  2020-07-09
+    * @Param:  [r, e]
+    * @return:  void
+    * @Description:  直接抛出异常并且打印出任务异常信息
+    */
     @Override
     public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
         String msg = String.format("Thread pool is EXHAUSTED!" +

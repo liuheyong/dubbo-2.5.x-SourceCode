@@ -27,6 +27,13 @@ import com.alibaba.dubbo.remoting.transport.dispatcher.WrappedChannelHandler;
 
 import java.util.concurrent.ExecutorService;
 
+/**
+ * @Author: wenyixicodedog
+ * @Date:  2020-07-09
+ * @Param:
+ * @return:
+ * @Description:  只有请求和响应消息派发到线程池，其它消息均在 IO 线程上执行
+ */
 public class MessageOnlyChannelHandler extends WrappedChannelHandler {
 
     public MessageOnlyChannelHandler(ChannelHandler handler, URL url) {

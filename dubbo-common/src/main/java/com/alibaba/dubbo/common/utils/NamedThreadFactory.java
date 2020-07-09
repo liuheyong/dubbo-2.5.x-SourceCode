@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * InternalThreadFactory.
  */
 public class NamedThreadFactory implements ThreadFactory {
+
     private static final AtomicInteger POOL_SEQ = new AtomicInteger(1);
 
     private final AtomicInteger mThreadNum = new AtomicInteger(1);

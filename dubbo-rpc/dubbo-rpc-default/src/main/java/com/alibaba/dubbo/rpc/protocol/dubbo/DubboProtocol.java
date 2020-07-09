@@ -69,12 +69,13 @@ public class DubboProtocol extends AbstractProtocol {
     //创建匿名实现类实现reply方法
     private ExchangeHandler requestHandler = new ExchangeHandlerAdapter() {
 
+        // TODO 从HeaderExchangeHandler#handleRequest#Object result = handler.reply(channel, msg);调用进来
         public Object reply(ExchangeChannel channel, Object message) throws RemotingException {
             if (message instanceof Invocation) {
                 Invocation inv = (Invocation) message;
-                //根据客户端请求信息封装key值从exporterMap取出接口实现类对象invoker
+                //根据客户端请求信息封装key值从exporterMap取出接口实现类对象invoker 获取 Invoker 实例
                 Invoker<?> invoker = getInvoker(channel, inv);
-                // need to consider backward-compatibility if it's a callback
+                // 如果是回调，则需要考虑向后兼容性
                 if (Boolean.TRUE.toString().equals(inv.getAttachments().get(IS_CALLBACK_SERVICE_INVOKE))) {
                     String methodsStr = invoker.getUrl().getParameters().get("methods");
                     boolean hasMethod = false;
@@ -192,6 +193,7 @@ public class DubboProtocol extends AbstractProtocol {
                         .equals(NetUtils.filterLocalHost(address.getAddress().getHostAddress()));
     }
 
+    //根据客户端请求信息封装key值从exporterMap取出接口实现类对象invoker 获取 Invoker 实例
     Invoker<?> getInvoker(Channel channel, Invocation inv) throws RemotingException {
         boolean isCallBackServiceInvoke = false;
         boolean isStubServiceInvoke = false;
@@ -208,13 +210,18 @@ public class DubboProtocol extends AbstractProtocol {
             path = inv.getAttachments().get(Constants.PATH_KEY) + "." + inv.getAttachments().get(Constants.CALLBACK_SERVICE_KEY);
             inv.getAttachments().put(IS_CALLBACK_SERVICE_INVOKE, Boolean.TRUE.toString());
         }
+        // TODO  计算 service key，格式为 groupName/serviceName:serviceVersion:port。比如：
+        //   dubbo/com.alibaba.dubbo.demo.DemoService:1.0.0:20880
         String serviceKey = serviceKey(port, path, inv.getAttachments().get(Constants.VERSION_KEY), inv.getAttachments().get(Constants.GROUP_KEY));
 
+        // TODO  从 exporterMap 查找与 serviceKey 相对应的 DubboExporter 对象，
+        //  服务导出过程中会将 <serviceKey, DubboExporter> 映射关系存储到 exporterMap 集合中
+        //  exporterMap是exporter缓存，这个在服务暴露通过export方法将wrapperInvoker暴露的时候会获取到exporter，然后放进缓存exporterMap
         DubboExporter<?> exporter = (DubboExporter<?>) exporterMap.get(serviceKey);
 
         if (exporter == null)
             throw new RemotingException(channel, "Not found exported service: " + serviceKey + " in " + exporterMap.keySet() + ", may be version or group mismatch " + ", channel: consumer: " + channel.getRemoteAddress() + " --> provider: " + channel.getLocalAddress() + ", message:" + inv);
-
+        // 获取 Invoker 对象，并返回
         return exporter.getInvoker();
     }
 
