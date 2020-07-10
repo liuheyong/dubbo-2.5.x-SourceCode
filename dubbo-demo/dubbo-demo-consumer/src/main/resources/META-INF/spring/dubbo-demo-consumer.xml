@@ -26,9 +26,7 @@
 
     <dubbo:registry address="zookeeper://127.0.0.1:2181" />
 
-    <dubbo:parameter key="heartbeat" value="1000"/>
-
     <!-- 生成远程服务的代理，然后可以与本地常规接口相同的方式使用demoService -->
-    <dubbo:reference init="true" id="demoService" check="false" timeout="86400000" interface="com.alibaba.dubbo.demo.DemoService"/>
+    <dubbo:reference init="false" id="demoService" check="false" timeout="86400000" interface="com.alibaba.dubbo.demo.DemoService"/>
 
 </beans>

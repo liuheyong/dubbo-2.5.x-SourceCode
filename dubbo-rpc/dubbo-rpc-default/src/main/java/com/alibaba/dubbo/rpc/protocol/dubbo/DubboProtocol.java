@@ -199,7 +199,7 @@ public class DubboProtocol extends AbstractProtocol {
         boolean isStubServiceInvoke = false;
         int port = channel.getLocalAddress().getPort();
         String path = inv.getAttachments().get(Constants.PATH_KEY);
-        // if it's callback service on client side
+        // 如果是客户端的回调服务
         isStubServiceInvoke = Boolean.TRUE.toString().equals(inv.getAttachments().get(Constants.STUB_EVENT_KEY));
         if (isStubServiceInvoke) {
             port = channel.getRemoteAddress().getPort();
