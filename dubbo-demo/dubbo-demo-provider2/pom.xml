@@ -25,10 +25,10 @@
         <version>2.5.10</version>
     </parent>
 
-    <artifactId>dubbo-demo-consumer</artifactId>
+    <artifactId>dubbo-demo-provider2</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
-    <description>The demo consumer module of dubbo project</description>
+    <description>The demo provider module of dubbo project</description>
 
     <properties>
         <skip_maven_deploy>false</skip_maven_deploy>

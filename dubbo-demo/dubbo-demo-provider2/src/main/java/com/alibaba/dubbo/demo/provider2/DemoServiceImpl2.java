@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alibaba.dubbo.demo.provider;
+package com.alibaba.dubbo.demo.provider2;
 
 import com.alibaba.dubbo.demo.DemoService;
 import com.alibaba.dubbo.rpc.RpcContext;
@@ -22,17 +22,17 @@ import com.alibaba.dubbo.rpc.RpcContext;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class DemoServiceImpl implements DemoService {
+public class DemoServiceImpl2 implements DemoService {
 
     public String sayHello(String name) {
-        System.out.println("[" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "] Hello  ============1============ " + name + ", request from consumer: " + RpcContext.getContext().getRemoteAddress());
-        return "Hello  ============1============ " + name + ", response form provider: " + RpcContext.getContext().getLocalAddress();
+        System.out.println("[" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "] Hello2  ============2============ " + name + ", request from consumer: " + RpcContext.getContext().getRemoteAddress());
+        return "Hello2  ============2============ " + name + ", response form provider: " + RpcContext.getContext().getLocalAddress();
     }
 
     @Override
     public String sayBye(String name) {
-        System.out.println("[" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "] Hello  ============1============ " + name + ", request from consumer: " + RpcContext.getContext().getRemoteAddress());
-        return "ByeBye  ============1============ " + name + ", response form provider: " + RpcContext.getContext().getLocalAddress();
+        System.out.println("[" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "] ByeBye2  ============2============ " + name + ", request from consumer: " + RpcContext.getContext().getRemoteAddress());
+        return "ByeBye2  ============2============ " + name + ", response form provider: " + RpcContext.getContext().getLocalAddress();
     }
 
 }

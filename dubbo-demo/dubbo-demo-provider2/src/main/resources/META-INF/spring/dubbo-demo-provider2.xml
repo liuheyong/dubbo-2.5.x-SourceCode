@@ -21,15 +21,15 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
-    <!-- 消费者的应用程序名称，用于跟踪依赖关系（不是匹配条件），请不要将其设置为提供者 -->
-    <dubbo:application name="demo-consumer"/>
-
-    <dubbo:protocol name="dubbo" port="20880" serialization="hessian2"/>
+    <dubbo:application name="demo-provider2"/>
 
     <dubbo:registry address="zookeeper://127.0.0.1:2181" />
 
-    <!-- 生成远程服务的代理，然后可以与本地常规接口相同的方式使用demoService -->
-    <dubbo:reference init="false" id="demoService" check="false" timeout="86400000" loadbalance="roundrobin"
-                     interface="com.alibaba.dubbo.demo.DemoService"/>
+    <dubbo:protocol name="dubbo" port="20888" serialization="hessian2"/>
+
+    <bean id="demoService" class="com.alibaba.dubbo.demo.provider2.DemoServiceImpl2"/>
+
+    <dubbo:service timeout="86400000" interface="com.alibaba.dubbo.demo.DemoService"
+                   ref="demoService" loadbalance="roundrobin"/>
 
 </beans>
