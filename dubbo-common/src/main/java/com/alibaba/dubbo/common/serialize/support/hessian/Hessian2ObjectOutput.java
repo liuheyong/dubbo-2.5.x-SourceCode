@@ -26,6 +26,7 @@ import java.io.OutputStream;
  * Hessian2 Object output.
  */
 public class Hessian2ObjectOutput implements ObjectOutput {
+
     private final Hessian2Output mH2o;
 
     public Hessian2ObjectOutput(OutputStream os) {

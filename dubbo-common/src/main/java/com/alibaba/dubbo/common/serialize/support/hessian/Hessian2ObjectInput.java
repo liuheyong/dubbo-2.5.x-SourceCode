@@ -27,6 +27,7 @@ import java.lang.reflect.Type;
  * Hessian2 Object input.
  */
 public class Hessian2ObjectInput implements ObjectInput {
+
     private final Hessian2Input mH2i;
 
     public Hessian2ObjectInput(InputStream is) {
