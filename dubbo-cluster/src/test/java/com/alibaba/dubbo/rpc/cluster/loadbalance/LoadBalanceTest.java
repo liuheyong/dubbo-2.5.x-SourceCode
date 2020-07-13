@@ -110,7 +110,7 @@ public class LoadBalanceTest {
     @Test
     public void testRoundRobinLoadBalance_select() {
         int runs = 10000;
-        Map<Invoker, AtomicLong> counter = getInvokeCounter(runs, RoundRobinLoadBalance.NAME);
+        Map<Invoker, AtomicLong> counter = getInvokeCounter(runs, RoundRobinLoadBalance2.NAME);
         for (Invoker minvoker : counter.keySet()) {
             Long count = counter.get(minvoker).get();
             Assert.assertTrue("abs diff shoud < 1", Math.abs(count - runs / (0f + invokers.size())) < 1f);

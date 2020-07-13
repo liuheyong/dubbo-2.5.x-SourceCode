@@ -19,30 +19,35 @@ package com.alibaba.dubbo.demo.consumer;
 import com.alibaba.dubbo.demo.DemoService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Consumer {
 
-    public static ExecutorService service = Executors.newFixedThreadPool(12);
+    public static ExecutorService service = Executors.newFixedThreadPool(1000);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         System.setProperty("java.net.preferIPv4Stack", "true");
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"META-INF/spring/dubbo-demo" + "-consumer.xml"});
         context.start();
-        DemoService demoService = (DemoService) context.getBean("demoService"); // get remote service proxy
-        for (int i = 1; i < 11; i++) {
-            service.execute(() -> System.out.println(demoService.sayBye("wenyixicodedog")));
-        }
 
-        //while (true) {
-        //    try {
-        //        String hello = demoService.sayHello("wenyixicodedog"); // call remote method
-        //        System.out.println(hello); // get result
-        //        //Thread.sleep(1000 * 60 * 60 * 24);
-        //    } catch (Throwable throwable) {
-        //        throwable.printStackTrace();
-        //    }
+        DemoService demoService = (DemoService) context.getBean("demoService"); // get remote service proxy
+
+        System.out.println(demoService.sayBye("wenyixicodedog"));
+        System.out.println(demoService.sayBye("wenyixicodedog"));
+        System.out.println(demoService.sayBye("wenyixicodedog"));
+        System.out.println(demoService.sayBye("wenyixicodedog"));
+        System.out.println(demoService.sayBye("wenyixicodedog"));
+        System.out.println(demoService.sayBye("wenyixicodedog"));
+        System.out.println(demoService.sayBye("wenyixicodedog"));
+        System.out.println(demoService.sayBye("wenyixicodedog"));
+        System.out.println(demoService.sayBye("wenyixicodedog"));
+        System.out.println(demoService.sayBye("wenyixicodedog"));
+        System.in.read();
+
+        //for (int i = 0; i < 12; i++) {
+        //    service.execute(() -> System.out.println(demoService.sayBye("wenyixicodedog")));
         //}
     }
 }

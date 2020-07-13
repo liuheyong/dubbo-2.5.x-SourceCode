@@ -31,7 +31,7 @@ import com.alibaba.dubbo.rpc.RpcException;
 import com.alibaba.dubbo.rpc.RpcInvocation;
 import com.alibaba.dubbo.rpc.cluster.Router;
 import com.alibaba.dubbo.rpc.cluster.loadbalance.LeastActiveLoadBalance;
-import com.alibaba.dubbo.rpc.cluster.loadbalance.RoundRobinLoadBalance;
+import com.alibaba.dubbo.rpc.cluster.loadbalance.RoundRobinLoadBalance2;
 import com.alibaba.dubbo.rpc.cluster.router.script.ScriptRouter;
 import com.alibaba.dubbo.rpc.cluster.router.script.ScriptRouterFactory;
 
@@ -368,7 +368,7 @@ public class RegistryDirectoryTest {
         }
         {
             serviceUrls.clear();
-            serviceUrls.add(SERVICEURL.addParameter(Constants.LOADBALANCE_KEY, RoundRobinLoadBalance.NAME));
+            serviceUrls.add(SERVICEURL.addParameter(Constants.LOADBALANCE_KEY, RoundRobinLoadBalance2.NAME));
             registryDirectory2.notify(serviceUrls);
 
             invocation = new RpcInvocation();

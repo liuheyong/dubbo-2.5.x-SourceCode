@@ -31,7 +31,7 @@ import com.alibaba.dubbo.rpc.cluster.directory.StaticDirectory;
 import com.alibaba.dubbo.rpc.cluster.filter.DemoService;
 import com.alibaba.dubbo.rpc.cluster.loadbalance.LeastActiveLoadBalance;
 import com.alibaba.dubbo.rpc.cluster.loadbalance.RandomLoadBalance;
-import com.alibaba.dubbo.rpc.cluster.loadbalance.RoundRobinLoadBalance;
+import com.alibaba.dubbo.rpc.cluster.loadbalance.RoundRobinLoadBalance2;
 
 import junit.framework.Assert;
 import org.easymock.EasyMock;
@@ -174,7 +174,7 @@ public class AbstractClusterInvokerTest {
 
     @Test
     public void testSelect_multiInvokers() throws Exception {
-        testSelect_multiInvokers(RoundRobinLoadBalance.NAME);
+        testSelect_multiInvokers(RoundRobinLoadBalance2.NAME);
         testSelect_multiInvokers(LeastActiveLoadBalance.NAME);
         testSelect_multiInvokers(RandomLoadBalance.NAME);
     }
@@ -195,7 +195,7 @@ public class AbstractClusterInvokerTest {
     @Test
     public void testDonotSelectAgainAndNoCheckAvailable() {
 
-        LoadBalance lb = ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtension(RoundRobinLoadBalance.NAME);
+        LoadBalance lb = ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtension(RoundRobinLoadBalance2.NAME);
         initlistsize5();
         {
             //Boundary condition test .
@@ -254,7 +254,7 @@ public class AbstractClusterInvokerTest {
     @Test
     public void testSelectAgainAndCheckAvailable() {
 
-        LoadBalance lb = ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtension(RoundRobinLoadBalance.NAME);
+        LoadBalance lb = ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtension(RoundRobinLoadBalance2.NAME);
         initlistsize5();
         {
             //Boundary condition test .
@@ -366,7 +366,7 @@ public class AbstractClusterInvokerTest {
     @Test
     public void testSelectBalance() {
 
-        LoadBalance lb = ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtension(RoundRobinLoadBalance.NAME);
+        LoadBalance lb = ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtension(RoundRobinLoadBalance2.NAME);
         initlistsize5();
 
         Map<Invoker, AtomicLong> counter = new ConcurrentHashMap<Invoker, AtomicLong>();

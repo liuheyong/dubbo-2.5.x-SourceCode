@@ -26,13 +26,13 @@ public class DemoServiceImpl implements DemoService {
 
     public String sayHello(String name) {
         System.out.println("[" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "] Hello  ============1============ " + name + ", request from consumer: " + RpcContext.getContext().getRemoteAddress());
-        return "Hello  ============1============ " + name + ", response form provider: " + RpcContext.getContext().getLocalAddress();
+        return "Hello  ============1============ " + name + ", response from provider: " + RpcContext.getContext().getLocalAddress();
     }
 
     @Override
     public String sayBye(String name) {
         System.out.println("[" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "] Hello  ============1============ " + name + ", request from consumer: " + RpcContext.getContext().getRemoteAddress());
-        return "ByeBye  ============1============ " + name + ", response form provider: " + RpcContext.getContext().getLocalAddress();
+        return "ByeBye  ============1============ " + name + ", response from provider: " + RpcContext.getContext().getLocalAddress();
     }
 
 }

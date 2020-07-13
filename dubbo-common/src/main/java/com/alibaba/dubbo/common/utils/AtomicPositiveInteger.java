@@ -19,7 +19,7 @@ package com.alibaba.dubbo.common.utils;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * AtomicPositiveInteger
+ * 原子正整数
  */
 public class AtomicPositiveInteger extends Number {
 
