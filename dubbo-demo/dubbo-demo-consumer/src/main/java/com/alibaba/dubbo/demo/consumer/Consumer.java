@@ -34,15 +34,15 @@ public class Consumer {
 
         DemoService demoService = (DemoService) context.getBean("demoService"); // get remote service proxy
 
-        System.out.println(demoService.sayBye("wenyixicodedog"));
-        System.out.println(demoService.sayBye("wenyixicodedog"));
-        System.out.println(demoService.sayBye("wenyixicodedog"));
-        System.out.println(demoService.sayBye("wenyixicodedog"));
-        System.out.println(demoService.sayBye("wenyixicodedog"));
-        System.out.println(demoService.sayBye("wenyixicodedog"));
-        System.out.println(demoService.sayBye("wenyixicodedog"));
-        System.out.println(demoService.sayBye("wenyixicodedog"));
-        System.out.println(demoService.sayBye("wenyixicodedog"));
+        //System.out.println(demoService.sayBye("wenyixicodedog"));
+        //System.out.println(demoService.sayBye("wenyixicodedog"));
+        //System.out.println(demoService.sayBye("wenyixicodedog"));
+        //System.out.println(demoService.sayBye("wenyixicodedog"));
+        //System.out.println(demoService.sayBye("wenyixicodedog"));
+        //System.out.println(demoService.sayBye("wenyixicodedog"));
+        //System.out.println(demoService.sayBye("wenyixicodedog"));
+        //System.out.println(demoService.sayBye("wenyixicodedog"));
+        //System.out.println(demoService.sayBye("wenyixicodedog"));
         System.out.println(demoService.sayBye("wenyixicodedog"));
         System.in.read();
 

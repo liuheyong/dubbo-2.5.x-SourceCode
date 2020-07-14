@@ -18,6 +18,7 @@ package com.alibaba.dubbo.demo.provider;
 
 import com.alibaba.dubbo.demo.DemoService;
 import com.alibaba.dubbo.rpc.RpcContext;
+import com.alibaba.dubbo.rpc.RpcException;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,7 +32,12 @@ public class DemoServiceImpl implements DemoService {
 
     @Override
     public String sayBye(String name) {
-        System.out.println("[" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "] Hello  ============1============ " + name + ", request from consumer: " + RpcContext.getContext().getRemoteAddress());
+        try {
+            //int a = 10 / 0;
+            System.out.println("[" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "] Hello  ============1============ " + name + ", request from consumer: " + RpcContext.getContext().getRemoteAddress());
+        } catch (Exception e) {
+            throw new RpcException(e);
+        }
         return "ByeBye  ============1============ " + name + ", response from provider: " + RpcContext.getContext().getLocalAddress();
     }
 

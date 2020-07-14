@@ -30,6 +30,6 @@
     <bean id="demoService" class="com.alibaba.dubbo.demo.provider2.DemoServiceImpl2"/>
 
     <dubbo:service timeout="86400000" interface="com.alibaba.dubbo.demo.DemoService"
-                   ref="demoService" weight="3" warmup="5000"/>
+                   ref="demoService" cluster="failfast" warmup="5000"/>
 
 </beans>
