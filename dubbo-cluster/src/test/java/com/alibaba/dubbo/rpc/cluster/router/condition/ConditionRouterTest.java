@@ -49,6 +49,7 @@ public class ConditionRouterTest {
     private URL getRouteUrl(String rule) {
         return SCRIPT_URL.addParameterAndEncoded(Constants.RULE_KEY, rule);
     }
+
     @Test
     public void testRoute_matchWhen() {
         Invocation invocation = new RpcInvocation();
