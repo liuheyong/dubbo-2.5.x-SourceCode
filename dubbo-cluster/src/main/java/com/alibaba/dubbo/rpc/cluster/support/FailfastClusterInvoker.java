@@ -46,9 +46,11 @@ public class FailfastClusterInvoker<T> extends AbstractClusterInvoker<T> {
         try {
             return invoker.invoke(invocation);
         } catch (Throwable e) {
-            if (e instanceof RpcException && ((RpcException) e).isBiz()) { // biz exception.
+            if (e instanceof RpcException && ((RpcException) e).isBiz()) {
+                // 若是业务逻辑异常：biz exception.往上抛，返回给客户端
                 throw (RpcException) e;
             }
+            // 若是其他异常，直接终止
             throw new RpcException(e instanceof RpcException ? ((RpcException) e).getCode() : 0, "Failfast invoke providers " + invoker.getUrl() + " " + loadbalance.getClass().getSimpleName() + " select from all providers " + invokers + " for service " + getInterface().getName() + " method " + invocation.getMethodName() + " on consumer " + NetUtils.getLocalHost() + " use dubbo version " + Version.getVersion() + ", but no luck to perform the invocation. Last error is: " + e.getMessage(), e.getCause() != null ? e.getCause() : e);
         }
     }
