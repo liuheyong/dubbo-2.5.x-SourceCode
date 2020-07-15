@@ -31,6 +31,7 @@ import static com.alibaba.dubbo.common.Constants.QOS_ENABLE;
 import static com.alibaba.dubbo.common.Constants.QOS_PORT;
 
 public class QosProtocolWrapper implements Protocol {
+
     private static AtomicBoolean hasStarted = new AtomicBoolean(false);
 
     private Protocol protocol;
