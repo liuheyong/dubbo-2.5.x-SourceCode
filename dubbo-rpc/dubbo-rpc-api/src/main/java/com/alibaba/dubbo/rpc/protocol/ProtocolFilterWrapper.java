@@ -43,6 +43,13 @@ public class ProtocolFilterWrapper implements Protocol {
         this.protocol = protocol;
     }
 
+    /** 
+    * @Author: wenyixicodedog
+    * @Date:  2020-08-05
+    * @Param:   
+    * @return:   
+    * @Description:  构造Filter链
+    */ 
     private static <T> Invoker<T> buildInvokerChain(final Invoker<T> invoker, String key, String group) {
         Invoker<T> last = invoker;
         List<Filter> filters = ExtensionLoader.getExtensionLoader(Filter.class).getActivateExtension(invoker.getUrl(), key, group);
