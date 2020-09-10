@@ -41,6 +41,7 @@ public class RpcInvocation implements Invocation, Serializable {
 
     private Object[] arguments;
 
+    // TODO RpcContext中传递的参数
     private Map<String, String> attachments;
 
     private transient Invoker<?> invoker;

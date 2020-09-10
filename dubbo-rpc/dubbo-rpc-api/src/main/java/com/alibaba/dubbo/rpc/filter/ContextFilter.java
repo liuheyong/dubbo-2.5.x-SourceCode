@@ -18,13 +18,7 @@ package com.alibaba.dubbo.rpc.filter;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.extension.Activate;
-import com.alibaba.dubbo.rpc.Filter;
-import com.alibaba.dubbo.rpc.Invocation;
-import com.alibaba.dubbo.rpc.Invoker;
-import com.alibaba.dubbo.rpc.Result;
-import com.alibaba.dubbo.rpc.RpcContext;
-import com.alibaba.dubbo.rpc.RpcException;
-import com.alibaba.dubbo.rpc.RpcInvocation;
+import com.alibaba.dubbo.rpc.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +32,7 @@ public class ContextFilter implements Filter {
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         Map<String, String> attachments = invocation.getAttachments();
         if (attachments != null) {
-            attachments = new HashMap<String, String>(attachments);
+            attachments = new HashMap<>(attachments);
             attachments.remove(Constants.PATH_KEY);
             attachments.remove(Constants.GROUP_KEY);
             attachments.remove(Constants.VERSION_KEY);
@@ -51,8 +45,7 @@ public class ContextFilter implements Filter {
                 .setInvoker(invoker)
                 .setInvocation(invocation)
                 .setAttachments(attachments)
-                .setLocalAddress(invoker.getUrl().getHost(),
-                        invoker.getUrl().getPort());
+                .setLocalAddress(invoker.getUrl().getHost(), invoker.getUrl().getPort());
         if (invocation instanceof RpcInvocation) {
             ((RpcInvocation) invocation).setInvoker(invoker);
         }

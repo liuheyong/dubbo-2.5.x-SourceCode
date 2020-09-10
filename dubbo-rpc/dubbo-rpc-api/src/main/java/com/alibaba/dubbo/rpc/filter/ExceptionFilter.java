@@ -100,7 +100,6 @@ public class ExceptionFilter implements Filter {
                     if (exception instanceof RpcException) {
                         return result;
                     }
-
                     // otherwise, wrap with RuntimeException and throw back to the client
                     return new RpcResult(new RuntimeException(StringUtils.toString(exception)));
                 } catch (Throwable e) {
