@@ -22,13 +22,7 @@ import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.alibaba.dubbo.common.utils.ReflectUtils;
 import com.alibaba.dubbo.common.utils.StringUtils;
-import com.alibaba.dubbo.rpc.Filter;
-import com.alibaba.dubbo.rpc.Invocation;
-import com.alibaba.dubbo.rpc.Invoker;
-import com.alibaba.dubbo.rpc.Result;
-import com.alibaba.dubbo.rpc.RpcContext;
-import com.alibaba.dubbo.rpc.RpcException;
-import com.alibaba.dubbo.rpc.RpcResult;
+import com.alibaba.dubbo.rpc.*;
 import com.alibaba.dubbo.rpc.service.GenericService;
 
 import java.lang.reflect.Method;
@@ -40,7 +34,8 @@ import java.lang.reflect.Method;
  * <ol>
  * <li>unexpected exception will be logged in ERROR level on provider side. Unexpected exception are unchecked
  * exception not declared on the interface</li>
- * <li>Wrap the exception not introduced in API package into RuntimeException. Framework will serialize the outer exception but stringnize its cause in order to avoid of possible serialization problem on client side</li>
+ * <li>Wrap the exception not introduced in API package into RuntimeException. Framework will serialize the outer exception but
+ * stringnize its cause in order to avoid of possible serialization problem on client side</li>
  * </ol>
  */
 @Activate(group = Constants.PROVIDER)
@@ -69,7 +64,8 @@ public class ExceptionFilter implements Filter {
                     }
                     // directly throw if the exception appears in the signature
                     try {
-                        Method method = invoker.getInterface().getMethod(invocation.getMethodName(), invocation.getParameterTypes());
+                        Method method = invoker.getInterface().getMethod(invocation.getMethodName(),
+                                invocation.getParameterTypes());
                         Class<?>[] exceptionClassses = method.getExceptionTypes();
                         for (Class<?> exceptionClass : exceptionClassses) {
                             if (exception.getClass().equals(exceptionClass)) {

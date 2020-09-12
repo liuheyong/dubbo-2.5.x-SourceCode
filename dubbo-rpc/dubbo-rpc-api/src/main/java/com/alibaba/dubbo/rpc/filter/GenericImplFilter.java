@@ -25,13 +25,7 @@ import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.alibaba.dubbo.common.utils.PojoUtils;
 import com.alibaba.dubbo.common.utils.ReflectUtils;
-import com.alibaba.dubbo.rpc.Filter;
-import com.alibaba.dubbo.rpc.Invocation;
-import com.alibaba.dubbo.rpc.Invoker;
-import com.alibaba.dubbo.rpc.Result;
-import com.alibaba.dubbo.rpc.RpcException;
-import com.alibaba.dubbo.rpc.RpcInvocation;
-import com.alibaba.dubbo.rpc.RpcResult;
+import com.alibaba.dubbo.rpc.*;
 import com.alibaba.dubbo.rpc.service.GenericException;
 import com.alibaba.dubbo.rpc.support.ProtocolUtils;
 
@@ -117,7 +111,8 @@ public class GenericImplFilter implements Filter {
                         lastException = e;
                         for (Constructor<?> constructor : clazz.getConstructors()) {
                             try {
-                                targetException = (Throwable) constructor.newInstance(new Object[constructor.getParameterTypes().length]);
+                                targetException =
+                                        (Throwable) constructor.newInstance(new Object[constructor.getParameterTypes().length]);
                                 break;
                             } catch (Throwable e1) {
                                 lastException = e1;
@@ -165,7 +160,6 @@ public class GenericImplFilter implements Filter {
                     }
                 }
             }
-
             ((RpcInvocation) invocation).setAttachment(
                     Constants.GENERIC_KEY, invoker.getUrl().getParameter(Constants.GENERIC_KEY));
         }

@@ -20,16 +20,12 @@ import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.extension.Activate;
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
-import com.alibaba.dubbo.rpc.Filter;
-import com.alibaba.dubbo.rpc.Invocation;
-import com.alibaba.dubbo.rpc.Invoker;
-import com.alibaba.dubbo.rpc.Result;
-import com.alibaba.dubbo.rpc.RpcException;
+import com.alibaba.dubbo.rpc.*;
 
 import java.util.Arrays;
 
 /**
- * Log any invocation timeout, but don't stop server from running
+ * 记录任何调用超时，但不要停止服务器运行
  */
 @Activate(group = Constants.PROVIDER)
 public class TimeoutFilter implements Filter {

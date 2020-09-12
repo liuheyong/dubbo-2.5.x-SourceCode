@@ -21,12 +21,7 @@ import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.alibaba.dubbo.common.utils.CompatibleTypeUtils;
 import com.alibaba.dubbo.common.utils.PojoUtils;
-import com.alibaba.dubbo.rpc.Filter;
-import com.alibaba.dubbo.rpc.Invocation;
-import com.alibaba.dubbo.rpc.Invoker;
-import com.alibaba.dubbo.rpc.Result;
-import com.alibaba.dubbo.rpc.RpcException;
-import com.alibaba.dubbo.rpc.RpcResult;
+import com.alibaba.dubbo.rpc.*;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -48,15 +43,11 @@ public class CompatibleFilter implements Filter {
                     Class<?> type = method.getReturnType();
                     Object newValue;
                     String serialization = invoker.getUrl().getParameter(Constants.SERIALIZATION_KEY);
-                    if ("json".equals(serialization)
-                            || "fastjson".equals(serialization)) {
+                    if ("json".equals(serialization) || "fastjson".equals(serialization)) {
                         Type gtype = method.getGenericReturnType();
                         newValue = PojoUtils.realize(value, type, gtype);
                     } else if (!type.isInstance(value)) {
-                        newValue = PojoUtils.isPojo(type)
-                                ? PojoUtils.realize(value, type)
-                                : CompatibleTypeUtils.compatibleTypeConvert(value, type);
-
+                        newValue = PojoUtils.isPojo(type) ? PojoUtils.realize(value, type) : CompatibleTypeUtils.compatibleTypeConvert(value, type);
                     } else {
                         newValue = value;
                     }
@@ -70,5 +61,4 @@ public class CompatibleFilter implements Filter {
         }
         return result;
     }
-
 }

@@ -19,12 +19,7 @@ package com.alibaba.dubbo.rpc.filter;
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.extension.Activate;
-import com.alibaba.dubbo.rpc.Filter;
-import com.alibaba.dubbo.rpc.Invocation;
-import com.alibaba.dubbo.rpc.Invoker;
-import com.alibaba.dubbo.rpc.Result;
-import com.alibaba.dubbo.rpc.RpcException;
-import com.alibaba.dubbo.rpc.RpcStatus;
+import com.alibaba.dubbo.rpc.*;
 
 import java.util.concurrent.Semaphore;
 
@@ -48,8 +43,9 @@ public class ExecuteLimitFilter implements Filter {
              * use semaphore for concurrency control (to limit thread number)
              */
             executesLimit = count.getSemaphore(max);
-            if(executesLimit != null && !(acquireResult = executesLimit.tryAcquire())) {
-                throw new RpcException("Failed to invoke method " + invocation.getMethodName() + " in provider " + url + ", cause: The service using threads greater than <dubbo:service executes=\"" + max + "\" /> limited.");
+            if (executesLimit != null && !(acquireResult = executesLimit.tryAcquire())) {
+                throw new RpcException("Failed to invoke method " + invocation.getMethodName() + " in provider " + url + ", cause" +
+                        ": The service using threads greater than <dubbo:service executes=\"" + max + "\" /> limited.");
             }
         }
         long begin = System.currentTimeMillis();
@@ -67,10 +63,9 @@ public class ExecuteLimitFilter implements Filter {
             }
         } finally {
             RpcStatus.endCount(url, methodName, System.currentTimeMillis() - begin, isSuccess);
-            if(acquireResult) {
+            if (acquireResult) {
                 executesLimit.release();
             }
         }
     }
-
 }
