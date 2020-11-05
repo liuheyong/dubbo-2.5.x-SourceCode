@@ -27,7 +27,7 @@
 
     <dubbo:protocol name="dubbo" port="20886" serialization="hessian2"/>
 
-    <bean id="demoService" class="com.alibaba.dubbo.demo.provider.DemoServiceImpl"/>
+    <bean id="demoService" class="com.alibaba.dubbo.demo.provider.demo.service.DemoServiceImpl"/>
 
     <dubbo:service timeout="86400000" interface="com.alibaba.dubbo.demo.DemoService"
                    ref="demoService" cluster="failfast" warmup="5000"/>

@@ -16,16 +16,9 @@
  */
 package com.alibaba.dubbo.config.spring;
 
-import com.alibaba.dubbo.config.ApplicationConfig;
-import com.alibaba.dubbo.config.ModuleConfig;
-import com.alibaba.dubbo.config.MonitorConfig;
-import com.alibaba.dubbo.config.ProtocolConfig;
-import com.alibaba.dubbo.config.ProviderConfig;
-import com.alibaba.dubbo.config.RegistryConfig;
-import com.alibaba.dubbo.config.ServiceConfig;
+import com.alibaba.dubbo.config.*;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.dubbo.config.spring.extension.SpringExtensionFactory;
-
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
@@ -102,6 +95,7 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
         }
     }
 
+    @Override
     public void setBeanName(String name) {
         this.beanName = name;
     }
@@ -116,15 +110,16 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
     }
 
     /**
-    * @Author: wenyixicodedog
-    * @Date:  2020-07-03
-    * @Param:
-    * @return:
-    * @Description:  ServiceBean实现了spring的ApplicationListener接口，所以也是一个监听器。
-     *               在spring容器加载完成后触发contextrefreshedevent事件，这个事件会被实现了ApplicationListener
-     *               接口的类监听到，执行对应的onApplicationEvent函数。
-    */
-        public void onApplicationEvent(ContextRefreshedEvent event) {
+     * @Author: wenyixicodedog
+     * @Date: 2020-07-03
+     * @Param:
+     * @return:
+     * @Description: ServiceBean实现了spring的ApplicationListener接口，所以也是一个监听器。
+     * 在spring容器加载完成后触发contextrefreshedevent事件，这个事件会被实现了ApplicationListener
+     * 接口的类监听到，执行对应的onApplicationEvent函数。
+     */
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
         if (isDelay() && !isExported() && !isUnexported()) {
             if (logger.isInfoEnabled()) {
                 logger.info("The service ready on spring started. service: " + getInterface());
@@ -144,12 +139,12 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
     }
 
     /**
-    * @Author: wenyixicodedog
-    * @Date:  2020-07-03
-    * @Param:  []
-    * @return:  void
-    * @Description:  主要进行一些初始化完成之后一些属性赋值操作
-    */
+     * @Author: wenyixicodedog
+     * @Date: 2020-07-03
+     * @Param: []
+     * @return: void
+     * @Description: 主要进行一些初始化完成之后一些属性赋值操作
+     */
     @SuppressWarnings({"unchecked", "deprecation"})
     public void afterPropertiesSet() throws Exception {
         if (getProvider() == null) {

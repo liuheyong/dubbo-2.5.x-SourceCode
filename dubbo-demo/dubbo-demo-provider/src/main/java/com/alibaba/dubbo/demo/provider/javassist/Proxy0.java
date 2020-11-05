@@ -25,6 +25,7 @@ public class Proxy0 implements ClassGenerator.DC, EchoService, DemoService {
     public Proxy0() {
     }
 
+    @Override
     public String sayHello(String string) throws Throwable {
         // 将参数存储到 Object 数组中
         Object[] arrobject = new Object[]{string};
@@ -42,6 +43,7 @@ public class Proxy0 implements ClassGenerator.DC, EchoService, DemoService {
     /**
      * 回声测试方法
      */
+    @Override
     public Object $echo(Object object) throws Throwable {
         Object[] arrobject = new Object[]{object};
         Object object2 = this.handler.invoke(this, methods[1], arrobject);
