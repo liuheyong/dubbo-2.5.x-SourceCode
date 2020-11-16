@@ -25,8 +25,7 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 /**
  * DubboNamespaceHandler
  *
- * @export
- * dubbo标签的解析
+ * @export dubbo标签的解析
  */
 public class DubboNamespaceHandler extends NamespaceHandlerSupport {
 
@@ -35,13 +34,13 @@ public class DubboNamespaceHandler extends NamespaceHandlerSupport {
     }
 
     /**
-    * @Author: wenyixicodedog
-    * @Date:  2020-07-01
-    * @Param:
-    * @return:
-    * @Description:  spring在扫描并加载BeanDefinition的时候会执行到这里
-    * 主要就是解析dubbo的相关标签，并把属性值装配到对应的实体类中。
-    */
+     * @Author: wenyixicodedog
+     * @Date: 2020-07-01
+     * @Param:
+     * @return:
+     * @Description: spring在扫描并加载BeanDefinition的时候会执行到这里
+     * 主要就是解析dubbo的相关标签，并把属性值装配到对应的实体类中。
+     */
     public void init() {
         registerBeanDefinitionParser("application", new DubboBeanDefinitionParser(ApplicationConfig.class, true));
         registerBeanDefinitionParser("module", new DubboBeanDefinitionParser(ModuleConfig.class, true));
