@@ -113,7 +113,7 @@ final class HeaderExchangeChannel implements ExchangeChannel {
         DefaultFuture future = new DefaultFuture(channel, req, timeout);
         try {
             // TODO  调用 NettyClient 的 send 方法发送请求 需要说明的是，
-            //  NettyClient 中并未实现 send 方法，该方法继承自父类 AbstractPeer，下面直接分析 AbstractPeer 的代码。
+            //  NettyClient 中并未实现 send 方法，该方法继承自父类 AbstractPeer
             channel.send(req);
         } catch (RemotingException e) {
             future.cancel();
