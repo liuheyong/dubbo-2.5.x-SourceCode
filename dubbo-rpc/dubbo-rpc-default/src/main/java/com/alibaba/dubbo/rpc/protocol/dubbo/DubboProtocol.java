@@ -283,7 +283,7 @@ public class DubboProtocol extends AbstractProtocol {
     private ExchangeServer createServer(URL url) {
         // send readonly event when server closes, it's enabled by default
         url = url.addParameterIfAbsent(Constants.CHANNEL_READONLYEVENT_SENT_KEY, Boolean.TRUE.toString());
-        // enable heartbeat by default
+        // TODO  默认启用心跳
         url = url.addParameterIfAbsent(Constants.HEARTBEAT_KEY, String.valueOf(Constants.DEFAULT_HEARTBEAT));
         String str = url.getParameter(Constants.SERVER_KEY, Constants.DEFAULT_REMOTING_SERVER);
 
@@ -392,7 +392,7 @@ public class DubboProtocol extends AbstractProtocol {
 
         // 添加编解码和心跳包参数到 url 中
         url = url.addParameter(Constants.CODEC_KEY, DubboCodec.NAME);
-        //默认开启heartbeat
+        // TODO 默认开启heartbeat
         url = url.addParameterIfAbsent(Constants.HEARTBEAT_KEY, String.valueOf(Constants.DEFAULT_HEARTBEAT));
 
         // 检测客户端类型是否存在，不存在则抛出异常

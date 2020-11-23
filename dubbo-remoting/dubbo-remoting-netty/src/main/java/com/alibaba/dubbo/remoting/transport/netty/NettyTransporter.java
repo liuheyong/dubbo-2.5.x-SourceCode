@@ -17,20 +17,18 @@
 package com.alibaba.dubbo.remoting.transport.netty;
 
 import com.alibaba.dubbo.common.URL;
-import com.alibaba.dubbo.remoting.ChannelHandler;
-import com.alibaba.dubbo.remoting.Client;
-import com.alibaba.dubbo.remoting.RemotingException;
-import com.alibaba.dubbo.remoting.Server;
-import com.alibaba.dubbo.remoting.Transporter;
+import com.alibaba.dubbo.remoting.*;
 
 public class NettyTransporter implements Transporter {
 
     public static final String NAME = "netty";
 
+    ///初始化服务端时调用
     public Server bind(URL url, ChannelHandler listener) throws RemotingException {
         return new NettyServer(url, listener);
     }
 
+    ///初始化客户端时触发
     public Client connect(URL url, ChannelHandler listener) throws RemotingException {
         // 创建 NettyClient 对象
         return new NettyClient(url, listener);

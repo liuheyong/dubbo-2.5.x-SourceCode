@@ -36,7 +36,7 @@ import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
 import java.io.IOException;
 
 /**
- * NettyCodecAdapter.
+ * Netty编解码器适配器.
  */
 final class NettyCodecAdapter {
 

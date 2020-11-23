@@ -113,6 +113,11 @@ public class NettyHandler extends SimpleChannelHandler {
         }
     }
 
+    /**
+    *@Author: liuheyong
+    *@date: 2020/11/23
+    *@Description: 对于异常的捕获
+    */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
         NettyChannel channel = NettyChannel.getOrAddChannel(ctx.getChannel(), url, handler);

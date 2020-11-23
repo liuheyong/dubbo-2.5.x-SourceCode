@@ -20,7 +20,6 @@ import com.alibaba.dubbo.common.concurrent.ListenableFutureTask;
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.alibaba.dubbo.common.utils.Assert;
-
 import org.I0Itec.zkclient.IZkChildListener;
 import org.I0Itec.zkclient.IZkStateListener;
 import org.I0Itec.zkclient.ZkClient;
@@ -45,7 +44,6 @@ public class ZkClientWrapper {
     private volatile KeeperState state;
     private ListenableFutureTask<ZkClient> listenableFutureTask;
     private volatile boolean started = false;
-
 
     public ZkClientWrapper(final String serverAddr, long timeout) {
         this.timeout = timeout;
@@ -133,6 +131,5 @@ public class ZkClientWrapper {
         Assert.notNull(client, new IllegalStateException("Zookeeper is not connected yet!"));
         client.unsubscribeChildChanges(path, listener);
     }
-
 
 }

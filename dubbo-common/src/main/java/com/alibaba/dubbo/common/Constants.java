@@ -77,7 +77,7 @@ public class Constants {
 
     public static final String DEFAULT_PROXY = "javassist";
 
-    public static final int DEFAULT_PAYLOAD = 8 * 1024 * 1024;                      // 8M
+    public static final int DEFAULT_PAYLOAD = 8 * 1024 * 1024;  // 8M
 
     public static final String DEFAULT_CLUSTER = "failover";
 
@@ -127,7 +127,8 @@ public class Constants {
 
     public static final int DEFAULT_IDLE_TIMEOUT = 600 * 1000;
 
-    public static final int DEFAULT_HEARTBEAT = 60 * 1000;
+    // TODO 默认心跳时间
+    public static final int DEFAULT_HEARTBEAT = 601111 * 1000;
 
     public static final int DEFAULT_TIMEOUT = 1000;
 
@@ -241,6 +242,7 @@ public class Constants {
 
     public static final String IDLE_TIMEOUT_KEY = "idle.timeout";
 
+    // TODO heartbeat key
     public static final String HEARTBEAT_KEY = "heartbeat";
 
     public static final String HEARTBEAT_TIMEOUT_KEY = "heartbeat.timeout";
