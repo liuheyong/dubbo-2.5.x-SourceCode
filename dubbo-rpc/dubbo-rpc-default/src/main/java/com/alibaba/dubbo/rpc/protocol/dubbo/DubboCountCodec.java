@@ -31,6 +31,7 @@ import java.io.IOException;
 
 public final class DubboCountCodec implements Codec2 {
 
+    //DubboCodec才是编解码具体实现
     private DubboCodec codec = new DubboCodec();
 
     public void encode(Channel channel, ChannelBuffer buffer, Object msg) throws IOException {

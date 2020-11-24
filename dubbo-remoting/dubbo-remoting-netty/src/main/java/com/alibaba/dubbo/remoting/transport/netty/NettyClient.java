@@ -60,7 +60,7 @@ public class NettyClient extends AbstractClient {
     }
 
     @Override
-    protected void doOpen() throws Throwable {
+    protected void doOpen() {
         NettyHelper.setNettyLoggerFactory();
         bootstrap = new ClientBootstrap(channelFactory);
         // config

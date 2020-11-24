@@ -40,10 +40,13 @@ import java.io.IOException;
  */
 final class NettyCodecAdapter {
 
+    //编码
     private final ChannelHandler encoder = new InternalEncoder();
 
+    // 解码
     private final ChannelHandler decoder = new InternalDecoder();
 
+    //Codec2是一个扩展点，对应不同协议的实现，因为介绍Dubbo协议，所以此处是DubboCountCodec
     private final Codec2 codec;
 
     private final URL url;

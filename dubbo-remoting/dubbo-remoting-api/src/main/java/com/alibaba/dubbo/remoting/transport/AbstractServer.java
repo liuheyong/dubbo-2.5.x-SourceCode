@@ -47,7 +47,7 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server 
     private InetSocketAddress localAddress;
     private InetSocketAddress bindAddress;
     private int accepts;
-    private int idleTimeout = 600; //600 seconds
+    private int idleTimeout; //600 seconds
 
     public AbstractServer(URL url, ChannelHandler handler) throws RemotingException {
         super(url, handler);

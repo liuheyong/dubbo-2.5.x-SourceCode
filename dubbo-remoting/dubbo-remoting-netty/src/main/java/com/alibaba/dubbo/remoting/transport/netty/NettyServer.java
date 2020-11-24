@@ -69,7 +69,7 @@ public class NettyServer extends AbstractServer implements Server {
     * @Description:  NettyServer相关设置
     */
     @Override
-    protected void doOpen() throws Throwable {
+    protected void doOpen() {
         NettyHelper.setNettyLoggerFactory();
         // TODO boss worker线程模型
         ExecutorService boss = Executors.newCachedThreadPool(new NamedThreadFactory("NettyServerBoss", true));

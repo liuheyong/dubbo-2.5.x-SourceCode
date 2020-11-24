@@ -28,15 +28,14 @@ public class ConsumerConfig extends AbstractReferenceConfig {
     // is default or not
     private Boolean isDefault;
 
-    // networking framework client uses: netty, mina, etc.
+    // TODO  网络框架客户端使用：netty，mina等。
     private String client;
 
     @Override
     public void setTimeout(Integer timeout) {
         super.setTimeout(timeout);
         String rmiTimeout = System.getProperty("sun.rmi.transport.tcp.responseTimeout");
-        if (timeout != null && timeout > 0
-                && (rmiTimeout == null || rmiTimeout.length() == 0)) {
+        if (timeout != null && timeout > 0 && (rmiTimeout == null || rmiTimeout.length() == 0)) {
             System.setProperty("sun.rmi.transport.tcp.responseTimeout", String.valueOf(timeout));
         }
     }
