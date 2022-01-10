@@ -23,12 +23,10 @@ import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.RpcStatus;
 
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * LeastActiveLoadBalance
- *
  */
 public class LeastActiveLoadBalance extends AbstractLoadBalance {
 
@@ -72,7 +70,7 @@ public class LeastActiveLoadBalance extends AbstractLoadBalance {
                 totalWeight += weight; // 累加权重
                 // 检测当前 Invoker 的权重与 firstWeight 是否相等，
                 // 不相等则将 sameWeight 置为 false
-                if (sameWeight && i > 0 && weight != firstWeight) {
+                if (sameWeight && weight != firstWeight) {
                     sameWeight = false;
                 }
             }
@@ -92,11 +90,11 @@ public class LeastActiveLoadBalance extends AbstractLoadBalance {
                 int leastIndex = leastIndexs[i];
                 // 获取权重值，并让随机数减去权重值  ⭐️
                 offsetWeight -= getWeight(invokers.get(leastIndex), invocation);
-                if (offsetWeight <= 0)
+                if (offsetWeight < 0)
                     return invokers.get(leastIndex);
             }
         }
-        // 如果权重相同或权重为0时，随机返回一个 Invoker
+        // 如果活跃数都相同，随机返回一个 Invoker
         return invokers.get(leastIndexs[ThreadLocalRandom.current().nextInt(leastCount)]);
     }
 }

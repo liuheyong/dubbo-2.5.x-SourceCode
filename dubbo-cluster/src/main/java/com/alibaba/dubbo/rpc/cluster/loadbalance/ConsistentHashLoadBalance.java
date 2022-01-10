@@ -21,7 +21,7 @@ import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.Invoker;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -32,13 +32,12 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * 一致的哈希负载平衡
- *
  */
 public class ConsistentHashLoadBalance extends AbstractLoadBalance {
 
     private final ConcurrentMap<String, ConsistentHashSelector<?>> selectors = new ConcurrentHashMap<>();
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("all")
     @Override
     protected <T> Invoker<T> doSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
         String key = invokers.get(0).getUrl().getServiceKey() + "." + invocation.getMethodName();
@@ -49,7 +48,7 @@ public class ConsistentHashLoadBalance extends AbstractLoadBalance {
         // 此时 selector.identityHashCode != identityHashCode 条件成立
         if (selector == null || selector.identityHashCode != identityHashCode) {
             // 创建新的 ConsistentHashSelector
-            selectors.put(key, new ConsistentHashSelector<T>(invokers, invocation.getMethodName(), identityHashCode));
+            selectors.put(key, new ConsistentHashSelector<>(invokers, invocation.getMethodName(), identityHashCode));
             selector = (ConsistentHashSelector<T>) selectors.get(key);
         }
         // 调用 ConsistentHashSelector 的 select 方法选择 Invoker
@@ -145,15 +144,9 @@ public class ConsistentHashLoadBalance extends AbstractLoadBalance {
             }
             md5.reset();
             byte[] bytes;
-            try {
-                bytes = value.getBytes("UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                throw new IllegalStateException(e.getMessage(), e);
-            }
+            bytes = value.getBytes(StandardCharsets.UTF_8);
             md5.update(bytes);
             return md5.digest();
         }
-
     }
-
 }

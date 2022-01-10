@@ -20,9 +20,7 @@ import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.Invoker;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -38,55 +36,9 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class RoundRobinLoadBalance3 extends AbstractLoadBalance {
 
-    public static final String NAME = "roundrobin";
+    public static final String NAME = "smoothroundrobin";
 
     private static int RECYCLE_PERIOD = 60000;
-
-    protected static class WeightedRoundRobin {
-        // 服务提供者权重
-        private int weight;
-        // 当前权重
-        private AtomicLong current = new AtomicLong(0);
-        // 最后一次更新时间
-        private long lastUpdate;
-
-        public void setWeight(int weight) {
-            this.weight = weight;
-            // 初始情况下，current = 0
-            current.set(0);
-        }
-
-        public long increaseCurrent() {
-            // current = current + weight；
-            return current.addAndGet(weight);
-        }
-
-        public void sel(int total) {
-            // current = current - total;
-            current.addAndGet(-1 * total);
-        }
-
-        public int getWeight() {
-            return weight;
-        }
-
-        public AtomicLong getCurrent() {
-            return current;
-        }
-
-        public void setCurrent(AtomicLong current) {
-            this.current = current;
-        }
-
-        public long getLastUpdate() {
-            return lastUpdate;
-        }
-
-        public void setLastUpdate(long lastUpdate) {
-            this.lastUpdate = lastUpdate;
-        }
-    }
-
     // 嵌套 Map 结构，存储的数据结构示例如下：
     // {
     //     "UserService.query": {
@@ -100,8 +52,7 @@ public class RoundRobinLoadBalance3 extends AbstractLoadBalance {
     // }
     // 最外层为服务类名 + 方法名，第二层为 url 到 WeightedRoundRobin 的映射关系。
     // 这里我们可以将 url 看成是服务提供者的 id
-    private ConcurrentMap<String, ConcurrentMap<String, WeightedRoundRobin>> methodWeightMap = new ConcurrentHashMap<>();
-
+    private ConcurrentMap<String, ConcurrentMap<String, RoundRobinWeighted>> methodWeightMap = new ConcurrentHashMap<>();
     // 原子更新锁
     private AtomicBoolean updateLock = new AtomicBoolean();
 
@@ -109,7 +60,7 @@ public class RoundRobinLoadBalance3 extends AbstractLoadBalance {
     protected <T> Invoker<T> doSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
         String key = invokers.get(0).getUrl().getServiceKey() + "." + invocation.getMethodName();
         // 获取 key 到 WeightedRoundRobin 映射表，如果为空，则创建一个新的
-        ConcurrentMap<String, WeightedRoundRobin> map = methodWeightMap.get(key);
+        ConcurrentMap<String, RoundRobinWeighted> map = methodWeightMap.get(key);
         if (map == null) {
             methodWeightMap.putIfAbsent(key, new ConcurrentHashMap<>());
             map = methodWeightMap.get(key);
@@ -120,7 +71,7 @@ public class RoundRobinLoadBalance3 extends AbstractLoadBalance {
         // 获取当前时间
         long now = System.currentTimeMillis();
         Invoker<T> selectedInvoker = null;
-        WeightedRoundRobin selectedWRR = null;
+        RoundRobinWeighted selectedWRR = null;
 
         // 下面这个循环主要做了这样几件事情：
         //   1. 遍历 Invoker 列表，检测当前 Invoker 是否有
@@ -134,7 +85,7 @@ public class RoundRobinLoadBalance3 extends AbstractLoadBalance {
         //   6. 计算权重总和
         for (Invoker<T> invoker : invokers) {
             String identifyString = invoker.getUrl().toIdentityString();
-            WeightedRoundRobin weightedRoundRobin = map.get(identifyString);
+            RoundRobinWeighted weightedRoundRobin = map.get(identifyString);
             int weight = getWeight(invoker, invocation);
             if (weight < 0) {
                 weight = 0;
@@ -142,7 +93,7 @@ public class RoundRobinLoadBalance3 extends AbstractLoadBalance {
 
             // 检测当前 Invoker 是否有对应的 WeightedRoundRobin，没有则创建
             if (weightedRoundRobin == null) {
-                weightedRoundRobin = new WeightedRoundRobin();
+                weightedRoundRobin = new RoundRobinWeighted();
                 // 设置 Invoker 权重
                 weightedRoundRobin.setWeight(weight);
                 // 存储 url 唯一标识 identifyString 到 weightedRoundRobin 的映射关系
@@ -177,18 +128,10 @@ public class RoundRobinLoadBalance3 extends AbstractLoadBalance {
         if (!updateLock.get() && invokers.size() != map.size()) {
             if (updateLock.compareAndSet(false, true)) {
                 try {
-                    ConcurrentMap<String, WeightedRoundRobin> newMap = new ConcurrentHashMap<>();
                     // 拷贝
-                    newMap.putAll(map);
-
+                    ConcurrentMap<String, RoundRobinWeighted> newMap = new ConcurrentHashMap<>(map);
                     // 遍历修改，即移除过期记录
-                    Iterator<Map.Entry<String, WeightedRoundRobin>> it = newMap.entrySet().iterator();
-                    while (it.hasNext()) {
-                        Map.Entry<String, WeightedRoundRobin> item = it.next();
-                        if (now - item.getValue().getLastUpdate() > RECYCLE_PERIOD) {
-                            it.remove();
-                        }
-                    }
+                    newMap.entrySet().removeIf(item -> now - item.getValue().getLastUpdate() > RECYCLE_PERIOD);
                     // 更新引用
                     methodWeightMap.put(key, newMap);
                 } finally {
@@ -208,4 +151,48 @@ public class RoundRobinLoadBalance3 extends AbstractLoadBalance {
         return invokers.get(0);
     }
 
+    protected static class RoundRobinWeighted {
+        // 服务提供者权重
+        private int weight;
+        // 当前权重
+        private AtomicLong current = new AtomicLong(0);
+        // 最后一次更新时间
+        private long lastUpdate;
+
+        public long increaseCurrent() {
+            // current = current + weight；
+            return current.addAndGet(weight);
+        }
+
+        public void sel(int total) {
+            // current = current - total;
+            current.addAndGet(-1 * total);
+        }
+
+        public int getWeight() {
+            return weight;
+        }
+
+        public void setWeight(int weight) {
+            this.weight = weight;
+            // 初始情况下，current = 0
+            current.set(0);
+        }
+
+        public AtomicLong getCurrent() {
+            return current;
+        }
+
+        public void setCurrent(AtomicLong current) {
+            this.current = current;
+        }
+
+        public long getLastUpdate() {
+            return lastUpdate;
+        }
+
+        public void setLastUpdate(long lastUpdate) {
+            this.lastUpdate = lastUpdate;
+        }
+    }
 }

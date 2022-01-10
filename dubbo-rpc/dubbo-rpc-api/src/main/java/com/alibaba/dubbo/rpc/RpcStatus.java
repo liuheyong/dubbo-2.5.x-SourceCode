@@ -34,10 +34,10 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class RpcStatus {
 
-    private static final ConcurrentMap<String, RpcStatus> SERVICE_STATISTICS = new ConcurrentHashMap<String, RpcStatus>();
+    private static final ConcurrentMap<String, RpcStatus> SERVICE_STATISTICS = new ConcurrentHashMap<>();
 
-    private static final ConcurrentMap<String, ConcurrentMap<String, RpcStatus>> METHOD_STATISTICS = new ConcurrentHashMap<String, ConcurrentMap<String, RpcStatus>>();
-    private final ConcurrentMap<String, Object> values = new ConcurrentHashMap<String, Object>();
+    private static final ConcurrentMap<String, ConcurrentMap<String, RpcStatus>> METHOD_STATISTICS = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Object> values = new ConcurrentHashMap<>();
     private final AtomicInteger active = new AtomicInteger();
     private final AtomicLong total = new AtomicLong();
     private final AtomicInteger failed = new AtomicInteger();
@@ -87,7 +87,7 @@ public class RpcStatus {
         String uri = url.toIdentityString();
         ConcurrentMap<String, RpcStatus> map = METHOD_STATISTICS.get(uri);
         if (map == null) {
-            METHOD_STATISTICS.putIfAbsent(uri, new ConcurrentHashMap<String, RpcStatus>());
+            METHOD_STATISTICS.putIfAbsent(uri, new ConcurrentHashMap<>());
             map = METHOD_STATISTICS.get(uri);
         }
         RpcStatus status = map.get(methodName);
@@ -319,7 +319,7 @@ public class RpcStatus {
      * @return thread number semaphore
      */
     public Semaphore getSemaphore(int maxThreadNum) {
-        if(maxThreadNum <= 0) {
+        if (maxThreadNum <= 0) {
             return null;
         }
 

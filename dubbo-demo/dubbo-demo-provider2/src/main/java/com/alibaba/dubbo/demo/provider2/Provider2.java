@@ -29,7 +29,6 @@ public class Provider2 {
 
         System.in.read(); // press any key to exit
     }
-
 }
 //服务暴露：
 //给一个service标签的serviceBean生成了一个代理好的Invoker，这个invoker放在一个叫exporter的对象下，

@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class RoundRobinLoadBalance2 extends AbstractLoadBalance {
 
-    public static final String NAME = "roundrobin";
+    public static final String NAME = "simpleroundrobin";
 
     //服务的调用序号(CAS自旋保证线程安全)
     private final ConcurrentMap<String, AtomicPositiveInteger> sequences = new ConcurrentHashMap<>();
@@ -93,30 +93,7 @@ public class RoundRobinLoadBalance2 extends AbstractLoadBalance {
                 }
             }
         }
-
         // 所有 Invoker 权重相等，此时进行普通的轮询即可
         return invokers.get(sequence.incrementAndGet() % length);
     }
-
-    private static final class IntegerWrapper {
-
-        private int value;
-
-        public IntegerWrapper(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        public void setValue(int value) {
-            this.value = value;
-        }
-
-        public void decrement() {
-            this.value--;
-        }
-    }
-
 }

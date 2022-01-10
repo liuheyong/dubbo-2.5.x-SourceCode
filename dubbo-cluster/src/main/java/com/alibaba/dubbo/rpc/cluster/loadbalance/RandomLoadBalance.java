@@ -21,12 +21,10 @@ import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.Invoker;
 
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * random load balance.
- *
  */
 public class RandomLoadBalance extends AbstractLoadBalance {
 
@@ -36,12 +34,12 @@ public class RandomLoadBalance extends AbstractLoadBalance {
     //private final Random random = new Random();
 
     /**
-    * @Author: wenyixicodedog
-    * @Date:  2020-07-12
-    * @Param:
-    * @return:
-    * @Description:
-    */
+     * @Author: wenyixicodedog
+     * @Date: 2020-07-12
+     * @Param:
+     * @return:
+     * @Description:
+     */
     protected <T> Invoker<T> doSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
         // invokers的数量
         int length = invokers.size();
@@ -67,15 +65,14 @@ public class RandomLoadBalance extends AbstractLoadBalance {
             // 表明其不会落在服务器 A 对应的区间上。
             // 第二次循环，offset - 3 = -1 < 0，即 5 < offset < 8，
             // 表明其会落在服务器 B 对应的区间上
-            for (int i = 0; i < length; i++) {
-                offset -= getWeight(invokers.get(i), invocation);
+            for (Invoker<T> invoker : invokers) {
+                offset -= getWeight(invoker, invocation);
                 if (offset < 0) {
-                    return invokers.get(i);
+                    return invoker;
                 }
             }
         }
         // 如果所有的invoker的权重都相等，从list中随机返回一个invoker
         return invokers.get(ThreadLocalRandom.current().nextInt(length));
     }
-
 }

@@ -29,7 +29,6 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * Round robin load balance.(一般的轮询方式)
- *
  */
 public class RoundRobinLoadBalance extends AbstractLoadBalance {
 
@@ -40,7 +39,6 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
     private final ConcurrentMap<String, AtomicPositiveInteger> sequences = new ConcurrentHashMap<>();
 
     protected <T> Invoker<T> doSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
-
         // key = 全限定类名 + "." + 方法名，比如 com.xxx.DemoService.sayHello
         String key = invokers.get(0).getUrl().getServiceKey() + "." + invocation.getMethodName();
         int length = invokers.size(); // Number of invokers
@@ -54,14 +52,14 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
         int weightSum = 0;
 
         // 下面这个循环主要用于查找最大和最小权重，计算权重总和等
-        for (int i = 0; i < length; i++) {
-            int weight = getWeight(invokers.get(i), invocation);
+        for (Invoker<T> invoker : invokers) {
+            int weight = getWeight(invoker, invocation);
             // 获取最大和最小权重
             maxWeight = Math.max(maxWeight, weight); // Choose the maximum weight
             minWeight = Math.min(minWeight, weight); // Choose the minimum weight
             if (weight > 0) {
                 // 将invoker weight 封装到 invokerToWeightMap 中
-                invokerToWeightMap.put(invokers.get(i), new IntegerWrapper(weight));
+                invokerToWeightMap.put(invoker, new IntegerWrapper(weight));
                 // 累加权重
                 weightSum += weight;
             }
@@ -126,5 +124,4 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
             this.value--;
         }
     }
-
 }

@@ -23,13 +23,12 @@
 
     <dubbo:application name="demo-provider"/>
 
-    <dubbo:registry address="zookeeper://127.0.0.1:2181" />
+    <dubbo:registry address="zookeeper://127.0.0.1:2181"/>
 
     <dubbo:protocol name="dubbo" port="20886" serialization="hessian2"/>
 
     <bean id="demoService" class="com.alibaba.dubbo.demo.provider.demo.service.DemoServiceImpl"/>
 
-    <dubbo:service timeout="86400000" interface="com.alibaba.dubbo.demo.DemoService"
-                   ref="demoService" cluster="failfast" warmup="5000"/>
+    <dubbo:service timeout="86400000" interface="com.alibaba.dubbo.demo.DemoService" ref="demoService" cluster="failfast" warmup="5000" loadbalance="consistenthash"/>
 
 </beans>

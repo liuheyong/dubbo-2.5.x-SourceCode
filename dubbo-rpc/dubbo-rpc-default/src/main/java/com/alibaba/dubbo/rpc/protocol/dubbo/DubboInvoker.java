@@ -24,13 +24,7 @@ import com.alibaba.dubbo.remoting.RemotingException;
 import com.alibaba.dubbo.remoting.TimeoutException;
 import com.alibaba.dubbo.remoting.exchange.ExchangeClient;
 import com.alibaba.dubbo.remoting.exchange.ResponseFuture;
-import com.alibaba.dubbo.rpc.Invocation;
-import com.alibaba.dubbo.rpc.Invoker;
-import com.alibaba.dubbo.rpc.Result;
-import com.alibaba.dubbo.rpc.RpcContext;
-import com.alibaba.dubbo.rpc.RpcException;
-import com.alibaba.dubbo.rpc.RpcInvocation;
-import com.alibaba.dubbo.rpc.RpcResult;
+import com.alibaba.dubbo.rpc.*;
 import com.alibaba.dubbo.rpc.protocol.AbstractInvoker;
 import com.alibaba.dubbo.rpc.support.RpcUtils;
 
@@ -65,14 +59,14 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
     }
 
     /**
-    * @Author: wenyixicodedog
-    * @Date:  2020-07-01
-    * @Param:  [invocation]
-    * @return:  com.alibaba.dubbo.rpc.Result
-    * @Description: // TODO 最后一步进行远程服务的调用的方法
-    */
+     * @Author: wenyixicodedog
+     * @Date: 2020-07-01
+     * @Param: [invocation]
+     * @return: com.alibaba.dubbo.rpc.Result
+     * @Description: // TODO 最后一步进行远程服务的调用的方法
+     */
     @Override
-    protected Result doInvoke(final Invocation invocation) throws Throwable {
+    protected Result doInvoke(final Invocation invocation) {
         RpcInvocation inv = (RpcInvocation) invocation;
         final String methodName = RpcUtils.getMethodName(invocation);
         // 设置 path 和 version 到 attachment 中
@@ -103,7 +97,7 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
                 RpcContext.getContext().setFuture(null);
                 // 返回一个空的 RpcResult
                 return new RpcResult();
-            // TODO  异步有返回值
+                // TODO  异步有返回值
             } else if (isAsync) {
                 // 发送请求，并得到一个 ResponseFuture 实例
                 ResponseFuture future = currentClient.request(inv, timeout);
@@ -111,7 +105,7 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
                 RpcContext.getContext().setFuture(new FutureAdapter<>(future));
                 // 暂时返回一个空结果
                 return new RpcResult();
-            // TODO  同步调用
+                // TODO  同步调用
             } else {
                 //默认阻塞请求
                 RpcContext.getContext().setFuture(null);

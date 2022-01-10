@@ -26,9 +26,21 @@ import java.util.List;
 
 /**
  * AbstractLoadBalance
- *
  */
 public abstract class AbstractLoadBalance implements LoadBalance {
+
+    /**
+     * @Author: wenyixicodedog
+     * @Date: 2020-07-11
+     * @Param:
+     * @return:
+     * @Description: 降权 主要用于保证当服务运行时长小于服务预热时间时，
+     * 对服务进行降权，避免让服务在启动之初就处于高负载状态
+     */
+    static int calculateWarmupWeight(int uptime, int warmup, int weight) {
+        int ww = (int) ((float) uptime / ((float) warmup / (float) weight));
+        return ww < 1 ? 1 : (Math.min(ww, weight));
+    }
 
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) {
         if (invokers == null || invokers.size() == 0)
@@ -42,12 +54,12 @@ public abstract class AbstractLoadBalance implements LoadBalance {
     protected abstract <T> Invoker<T> doSelect(List<Invoker<T>> invokers, URL url, Invocation invocation);
 
     /**
-    * @Author: wenyixicodedog
-    * @Date:  2020-07-11
-    * @Param:
-    * @return:
-    * @Description:  获取权重 weight
-    */
+     * @Author: wenyixicodedog
+     * @Date: 2020-07-11
+     * @Param:
+     * @return:
+     * @Description: 获取权重 weight
+     */
     protected int getWeight(Invoker<?> invoker, Invocation invocation) {
         // 从 url 中获取权重 weight 配置值
         int weight = invoker.getUrl().getMethodParameter(invocation.getMethodName(), Constants.WEIGHT_KEY, Constants.DEFAULT_WEIGHT);
@@ -67,18 +79,4 @@ public abstract class AbstractLoadBalance implements LoadBalance {
         }
         return weight;
     }
-
-    /**
-    * @Author: wenyixicodedog
-    * @Date:  2020-07-11
-    * @Param:
-    * @return:
-    * @Description:  降权 主要用于保证当服务运行时长小于服务预热时间时，
-     * 对服务进行降权，避免让服务在启动之初就处于高负载状态
-    */
-    static int calculateWarmupWeight(int uptime, int warmup, int weight) {
-        int ww = (int) ((float) uptime / ((float) warmup / (float) weight));
-        return ww < 1 ? 1 : (ww > weight ? weight : ww);
-    }
-
 }
